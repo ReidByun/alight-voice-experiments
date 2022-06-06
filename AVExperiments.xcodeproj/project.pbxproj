@@ -8,13 +8,27 @@
 
 /* Begin PBXBuildFile section */
 		30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */; };
-		30F6B448284AF1DE007C3440 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B447284AF1DE007C3440 /* ContentView.swift */; };
 		30F6B44A284AF1E0007C3440 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B449284AF1E0007C3440 /* Assets.xcassets */; };
 		30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B44C284AF1E0007C3440 /* Preview Assets.xcassets */; };
 		30F6B457284AF1E0007C3440 /* AVExperimentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B456284AF1E0007C3440 /* AVExperimentsTests.swift */; };
 		30F6B461284AF1E0007C3440 /* AVExperimentsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B460284AF1E0007C3440 /* AVExperimentsUITests.swift */; };
 		30F6B463284AF1E0007C3440 /* AVExperimentsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B462284AF1E0007C3440 /* AVExperimentsUITestsLaunchTests.swift */; };
 		30F6B471284AF576007C3440 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 30F6B470284AF576007C3440 /* ComposableArchitecture */; };
+		30F6B476284AFD04007C3440 /* ScrubbingPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B475284AFD04007C3440 /* ScrubbingPlayerView.swift */; };
+		30F6B478284AFD36007C3440 /* ScrubbingPlayerFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B477284AFD36007C3440 /* ScrubbingPlayerFeature.swift */; };
+		30F6B47A284AFD48007C3440 /* ScrubbingPlayerEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B479284AFD48007C3440 /* ScrubbingPlayerEffects.swift */; };
+		30F6B47C284AFD57007C3440 /* ScrubbingPlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B47B284AFD57007C3440 /* ScrubbingPlayerModel.swift */; };
+		30F6B47E284B233D007C3440 /* SystemEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B47D284B233D007C3440 /* SystemEnvironment.swift */; };
+		30F6B482284B256E007C3440 /* Image+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B480284B256E007C3440 /* Image+Extension.swift */; };
+		30F6B483284B256E007C3440 /* PlayerTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B481284B256E007C3440 /* PlayerTime.swift */; };
+		30F6B486284B25B6007C3440 /* IU-5s.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B484284B25B6007C3440 /* IU-5s.mp3 */; };
+		30F6B487284B25B6007C3440 /* IU-12s.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B485284B25B6007C3440 /* IU-12s.mp3 */; };
+		30F6B48A284E45D5007C3440 /* RootFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B489284E45D5007C3440 /* RootFeature.swift */; };
+		30F6B48C284E45F3007C3440 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B48B284E45F3007C3440 /* RootView.swift */; };
+		30F6B48F284E49BB007C3440 /* AudioPlayerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B48E284E49BB007C3440 /* AudioPlayerClient.swift */; };
+		30F6B491284E49DA007C3440 /* AudioPlayerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B490284E49DA007C3440 /* AudioPlayerClient+Live.swift */; };
+		30F6B493284E555C007C3440 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B492284E555C007C3440 /* APIError.swift */; };
+		30F6B495284E5875007C3440 /* AU in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B494284E5875007C3440 /* AU */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,7 +51,6 @@
 /* Begin PBXFileReference section */
 		30F6B442284AF1DE007C3440 /* AVExperiments.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVExperiments.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVExperimentsApp.swift; sourceTree = "<group>"; };
-		30F6B447284AF1DE007C3440 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		30F6B449284AF1E0007C3440 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		30F6B44C284AF1E0007C3440 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		30F6B452284AF1E0007C3440 /* AVExperimentsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVExperimentsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,6 +58,21 @@
 		30F6B45C284AF1E0007C3440 /* AVExperimentsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVExperimentsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30F6B460284AF1E0007C3440 /* AVExperimentsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVExperimentsUITests.swift; sourceTree = "<group>"; };
 		30F6B462284AF1E0007C3440 /* AVExperimentsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVExperimentsUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		30F6B475284AFD04007C3440 /* ScrubbingPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerView.swift; sourceTree = "<group>"; };
+		30F6B477284AFD36007C3440 /* ScrubbingPlayerFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerFeature.swift; sourceTree = "<group>"; };
+		30F6B479284AFD48007C3440 /* ScrubbingPlayerEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerEffects.swift; sourceTree = "<group>"; };
+		30F6B47B284AFD57007C3440 /* ScrubbingPlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerModel.swift; sourceTree = "<group>"; };
+		30F6B47D284B233D007C3440 /* SystemEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEnvironment.swift; sourceTree = "<group>"; };
+		30F6B480284B256E007C3440 /* Image+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Image+Extension.swift"; sourceTree = "<group>"; };
+		30F6B481284B256E007C3440 /* PlayerTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerTime.swift; sourceTree = "<group>"; };
+		30F6B484284B25B6007C3440 /* IU-5s.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "IU-5s.mp3"; sourceTree = "<group>"; };
+		30F6B485284B25B6007C3440 /* IU-12s.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "IU-12s.mp3"; sourceTree = "<group>"; };
+		30F6B489284E45D5007C3440 /* RootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootFeature.swift; sourceTree = "<group>"; };
+		30F6B48B284E45F3007C3440 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		30F6B48E284E49BB007C3440 /* AudioPlayerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerClient.swift; sourceTree = "<group>"; };
+		30F6B490284E49DA007C3440 /* AudioPlayerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayerClient+Live.swift"; sourceTree = "<group>"; };
+		30F6B492284E555C007C3440 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		30F6B494284E5875007C3440 /* AU */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AU; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,8 +125,12 @@
 			isa = PBXGroup;
 			children = (
 				30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */,
-				30F6B447284AF1DE007C3440 /* ContentView.swift */,
+				30F6B472284AFBF9007C3440 /* Root */,
+				30F6B473284AFC06007C3440 /* Share */,
+				30F6B474284AFC10007C3440 /* ScrubbingPlayer */,
 				30F6B449284AF1E0007C3440 /* Assets.xcassets */,
+				30F6B484284B25B6007C3440 /* IU-5s.mp3 */,
+				30F6B485284B25B6007C3440 /* IU-12s.mp3 */,
 				30F6B44B284AF1E0007C3440 /* Preview Content */,
 			);
 			path = AVExperiments;
@@ -127,6 +159,56 @@
 				30F6B462284AF1E0007C3440 /* AVExperimentsUITestsLaunchTests.swift */,
 			);
 			path = AVExperimentsUITests;
+			sourceTree = "<group>";
+		};
+		30F6B472284AFBF9007C3440 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				30F6B489284E45D5007C3440 /* RootFeature.swift */,
+				30F6B48B284E45F3007C3440 /* RootView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		30F6B473284AFC06007C3440 /* Share */ = {
+			isa = PBXGroup;
+			children = (
+				30F6B47D284B233D007C3440 /* SystemEnvironment.swift */,
+			);
+			path = Share;
+			sourceTree = "<group>";
+		};
+		30F6B474284AFC10007C3440 /* ScrubbingPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				30F6B494284E5875007C3440 /* AU */,
+				30F6B48D284E4979007C3440 /* AudioPlayerClient */,
+				30F6B47F284B2557007C3440 /* UtilExt */,
+				30F6B477284AFD36007C3440 /* ScrubbingPlayerFeature.swift */,
+				30F6B475284AFD04007C3440 /* ScrubbingPlayerView.swift */,
+				30F6B479284AFD48007C3440 /* ScrubbingPlayerEffects.swift */,
+				30F6B47B284AFD57007C3440 /* ScrubbingPlayerModel.swift */,
+			);
+			path = ScrubbingPlayer;
+			sourceTree = "<group>";
+		};
+		30F6B47F284B2557007C3440 /* UtilExt */ = {
+			isa = PBXGroup;
+			children = (
+				30F6B480284B256E007C3440 /* Image+Extension.swift */,
+				30F6B481284B256E007C3440 /* PlayerTime.swift */,
+				30F6B492284E555C007C3440 /* APIError.swift */,
+			);
+			path = UtilExt;
+			sourceTree = "<group>";
+		};
+		30F6B48D284E4979007C3440 /* AudioPlayerClient */ = {
+			isa = PBXGroup;
+			children = (
+				30F6B48E284E49BB007C3440 /* AudioPlayerClient.swift */,
+				30F6B490284E49DA007C3440 /* AudioPlayerClient+Live.swift */,
+			);
+			path = AudioPlayerClient;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,7 +321,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F6B495284E5875007C3440 /* AU in Resources */,
 				30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */,
+				30F6B487284B25B6007C3440 /* IU-12s.mp3 in Resources */,
+				30F6B486284B25B6007C3440 /* IU-5s.mp3 in Resources */,
 				30F6B44A284AF1E0007C3440 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,8 +350,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30F6B448284AF1DE007C3440 /* ContentView.swift in Sources */,
+				30F6B48A284E45D5007C3440 /* RootFeature.swift in Sources */,
+				30F6B483284B256E007C3440 /* PlayerTime.swift in Sources */,
+				30F6B47C284AFD57007C3440 /* ScrubbingPlayerModel.swift in Sources */,
 				30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */,
+				30F6B482284B256E007C3440 /* Image+Extension.swift in Sources */,
+				30F6B476284AFD04007C3440 /* ScrubbingPlayerView.swift in Sources */,
+				30F6B47A284AFD48007C3440 /* ScrubbingPlayerEffects.swift in Sources */,
+				30F6B48F284E49BB007C3440 /* AudioPlayerClient.swift in Sources */,
+				30F6B478284AFD36007C3440 /* ScrubbingPlayerFeature.swift in Sources */,
+				30F6B47E284B233D007C3440 /* SystemEnvironment.swift in Sources */,
+				30F6B491284E49DA007C3440 /* AudioPlayerClient+Live.swift in Sources */,
+				30F6B48C284E45F3007C3440 /* RootView.swift in Sources */,
+				30F6B493284E555C007C3440 /* APIError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +529,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -462,6 +559,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
