@@ -9,22 +9,24 @@ import ComposableArchitecture
 
 @dynamicMemberLookup
 struct SystemEnvironment<Environment> {
-  var environment: Environment
-
-  subscript<Dependency>(
-    dynamicMember keyPath: WritableKeyPath<Environment, Dependency>
-  ) -> Dependency {
-    get { self.environment[keyPath: keyPath] }
-    set { self.environment[keyPath: keyPath] = newValue }
-  }
-
-  var mainQueue: () -> AnySchedulerOf<DispatchQueue>
-
-  static func live(environment: Environment) -> Self {
-    Self(environment: environment, mainQueue: { .main })
-  }
-
-  static func dev(environment: Environment) -> Self {
-    Self(environment: environment, mainQueue: { .main })
-  }
+    var environment: Environment
+    
+    subscript<Dependency>(
+        dynamicMember keyPath: WritableKeyPath<Environment, Dependency>
+    ) -> Dependency {
+        get { self.environment[keyPath: keyPath] }
+        set { self.environment[keyPath: keyPath] = newValue }
+    }
+    
+    var mainQueue: () -> AnySchedulerOf<DispatchQueue>
+    var audioPlayer: AudioPlayerClient
+    
+    static func live(environment: Environment, audioPlayer: AudioPlayerClient) -> Self {
+        print("SystemEnvironment init live ttt")
+        return Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
+    }
+    
+    static func dev(environment: Environment, audioPlayer: AudioPlayerClient) -> Self {
+        Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
+    }
 }

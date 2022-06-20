@@ -28,15 +28,15 @@ struct ScrubbingPlayerView: View {
                     print("play / pause")
                     viewStore.send(.playPauseTapped(viewStore.playerInfo))
                 } label: {
-    //                ZStack {
-    //                    Color.blue
-    //                        .frame(
-    //                            width: 10,
-    //                            height: 35 * CGFloat(viewModel.meterLevel))
-    //                        .opacity(0.5)
-    //
-                        viewStore.playerInfo.isPlaying ? Image.pause : Image.play
-    //                }
+                    //                ZStack {
+                    //                    Color.blue
+                    //                        .frame(
+                    //                            width: 10,
+                    //                            height: 35 * CGFloat(viewModel.meterLevel))
+                    //                        .opacity(0.5)
+                    //
+                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
+                    //                }
                 }
                 .frame(width: 40)
                 .font(.system(size: 45))
@@ -53,9 +53,9 @@ struct ScrubbingPlayerView: View {
     
     private var PlayerControlView: some View {
         VStack {
-//            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
-//                .padding(.bottom, 8)
-//                .frame(height: 40)
+            //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
+            //                .padding(.bottom, 8)
+            //                .frame(height: 40)
             
             HStack {
                 //Text(viewModel.playerTime.elapsedText)
@@ -68,7 +68,7 @@ struct ScrubbingPlayerView: View {
             
             
             AudioControlButtonsView
-                //.disabled(!viewModel.isPlayerReady)
+            //.disabled(!viewModel.isPlayerReady)
                 .padding(.bottom)
             
         }
@@ -77,61 +77,61 @@ struct ScrubbingPlayerView: View {
     
     private var AudioControlButtonsView: some View {
         WithViewStore(self.store) { viewStore in
-        HStack(spacing: 20) {
-            Spacer()
-            
-            Button {
-                //viewModel.skip(forwards: false)
-                print("backward")
-            } label: {
-                Image.backward
+            HStack(spacing: 20) {
+                Spacer()
+                
+                Button {
+                    //viewModel.skip(forwards: false)
+                    print("backward")
+                } label: {
+                    Image.backward
+                }
+                .font(.system(size: 32))
+                
+                Spacer()
+                
+                Button {
+                    print("play / pause")
+                    //                viewStore.send(.playPauseTapped(viewStore.playerInfo))
+                } label: {
+                    //                ZStack {
+                    //                    Color.blue
+                    //                        .frame(
+                    //                            width: 10,
+                    //                            height: 35 * CGFloat(viewModel.meterLevel))
+                    //                        .opacity(0.5)
+                    //
+                    //                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
+                    //                }
+                }
+                .frame(width: 40)
+                .font(.system(size: 45))
+                
+                Spacer()
+                
+                Button {
+                    print("forward")
+                } label: {
+                    Image.forward
+                }
+                .font(.system(size: 32))
+                
+                Spacer()
             }
-            .font(.system(size: 32))
-            
-            Spacer()
-            
-            Button {
-                print("play / pause")
-//                viewStore.send(.playPauseTapped(viewStore.playerInfo))
-            } label: {
-//                ZStack {
-//                    Color.blue
-//                        .frame(
-//                            width: 10,
-//                            height: 35 * CGFloat(viewModel.meterLevel))
-//                        .opacity(0.5)
-//
-//                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
-//                }
-            }
-            .frame(width: 40)
-            .font(.system(size: 45))
-            
-            Spacer()
-            
-            Button {
-                print("forward")
-            } label: {
-                Image.forward
-            }
-            .font(.system(size: 32))
-            
-            Spacer()
-        }
-        .foregroundColor(.primary)
-        .padding(.vertical, 20)
-        .frame(height: 58)
+            .foregroundColor(.primary)
+            .padding(.vertical, 20)
+            .frame(height: 58)
         }
     }
-//}
+    //}
 }
 
 fileprivate struct SliderBarView: View {
     @Binding var value: Double
     //@State private var isEditing = false
     @Binding var isEditing: Bool
-
-
+    
+    
     var body: some View {
         VStack {
             Slider(

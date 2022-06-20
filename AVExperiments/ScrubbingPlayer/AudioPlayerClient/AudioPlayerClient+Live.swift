@@ -10,9 +10,10 @@ import ComposableArchitecture
 import StoreKit
 
 extension AudioPlayerClient {
-    static var live: Self {
+    static var livePlayerClient: Self {
         var test = 2
         var delegate: AudioPlayerClientDelegate?
+        print("init AudioPlayeClient Live ttt")
         return Self(
             setSession: {
                 do {
@@ -24,8 +25,8 @@ extension AudioPlayerClient {
                     //let duration = 1.00 * (44100/48000.0)
                     try AVAudioSession.sharedInstance().setPreferredIOBufferDuration(duration)
                     try AVAudioSession.sharedInstance().setActive(true)
-                    NSLog("Session is Active")
-                    test = 3
+                    NSLog("Session is Active v=\(test)")
+                    test = test + 1
                 } catch {
                     NSLog("ERROR: CANNOT PLAY MUSIC IN BACKGROUND. Message from code: \"\(error)\"")
                 }
@@ -47,8 +48,9 @@ extension AudioPlayerClient {
                                 }
                             )
                             
-                            delegate?.testPlay()
-                            test = 4
+                            print("open url-\(url) v=\(test)")
+                            test = test + 1
+                            
                             callback(.success(ScrubbingPlayerModel()))
                         } catch {
                             callback(.failure(.failedToOpenFile))
@@ -57,15 +59,15 @@ extension AudioPlayerClient {
             },
             play: {
                 .fireAndForget {
-                    print("fire")
-                    test = 5
+                    print("fire v=\(test)")
+                    test = test + 1
                     delegate?.player.play()
                 }
             },
             stop: {
                 .fireAndForget {
-                    print("stop fire")
-                    test = 6
+                    print("stop fire v=\(test)")
+                    test = test + 1
                     delegate?.player.stop()
                 }
             }

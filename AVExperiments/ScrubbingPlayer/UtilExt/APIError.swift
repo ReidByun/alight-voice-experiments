@@ -8,5 +8,5 @@
 import Foundation
 
 enum APIError: Error {
-  case failedToOpenFile
+    case failedToOpenFile
 }

@@ -37,19 +37,19 @@ let scrubbingPlayerReducer = Reducer<
             return .none
         }
         return environment.audioPlayer.openUrl(fileURL)
-            //.receive(on: environment.mainQueue)
+        //.receive(on: environment.mainQueue)
             .catchToEffect()
             .map(ScrubbingPlayerAction.audioLoaded)
     case .skipTapped(let forward):
         return .none
-//    case .dataLoaded(let result):
-//        switch result {
-//        case .success(let repositories):
-//            state.repositories = repositories
-//        case .failure(let error):
-//            break
-//        }
-//        return .none
+        //    case .dataLoaded(let result):
+        //        switch result {
+        //        case .success(let repositories):
+        //            state.repositories = repositories
+        //        case .failure(let error):
+        //            break
+        //        }
+        //        return .none
     case .playPauseTapped(let playerInfo):
         if state.playerInfo.isPlaying {
             //environment.audioPlayer.stop()
@@ -66,9 +66,9 @@ let scrubbingPlayerReducer = Reducer<
     case .audioLoaded(let result):
         switch result {
         case .success(let info):
-          state.playerInfo = info
+            state.playerInfo = info
         case .failure(let error):
-          break
+            break
         }
         //return environment.audioPlayer.play().fireAndForget()
         return .none

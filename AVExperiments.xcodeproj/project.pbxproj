@@ -28,7 +28,6 @@
 		30F6B48F284E49BB007C3440 /* AudioPlayerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B48E284E49BB007C3440 /* AudioPlayerClient.swift */; };
 		30F6B491284E49DA007C3440 /* AudioPlayerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B490284E49DA007C3440 /* AudioPlayerClient+Live.swift */; };
 		30F6B493284E555C007C3440 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B492284E555C007C3440 /* APIError.swift */; };
-		30F6B495284E5875007C3440 /* AU in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B494284E5875007C3440 /* AU */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,7 +71,6 @@
 		30F6B48E284E49BB007C3440 /* AudioPlayerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerClient.swift; sourceTree = "<group>"; };
 		30F6B490284E49DA007C3440 /* AudioPlayerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayerClient+Live.swift"; sourceTree = "<group>"; };
 		30F6B492284E555C007C3440 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
-		30F6B494284E5875007C3440 /* AU */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AU; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,7 +179,6 @@
 		30F6B474284AFC10007C3440 /* ScrubbingPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				30F6B494284E5875007C3440 /* AU */,
 				30F6B48D284E4979007C3440 /* AudioPlayerClient */,
 				30F6B47F284B2557007C3440 /* UtilExt */,
 				30F6B477284AFD36007C3440 /* ScrubbingPlayerFeature.swift */,
@@ -321,7 +318,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30F6B495284E5875007C3440 /* AU in Resources */,
 				30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */,
 				30F6B487284B25B6007C3440 /* IU-12s.mp3 in Resources */,
 				30F6B486284B25B6007C3440 /* IU-5s.mp3 in Resources */,
