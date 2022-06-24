@@ -19,6 +19,7 @@ enum ScrubbingPlayerAction: Equatable {
     case audioLoaded(Result<ScrubbingPlayerModel, APIError>)
     case playPauseTapped(ScrubbingPlayerModel)
     case skipTapped(forward: Bool)
+    case playingAudio(Result<AudioPlayerClient.Action, AudioPlayerClient.Failure>)
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -37,29 +38,32 @@ let scrubbingPlayerReducer = Reducer<
             return .none
         }
         return environment.audioPlayer.openUrl(fileURL)
-        //.receive(on: environment.mainQueue)
+            //.receive(on: DispatchQueue.main)
+            .receive(on: environment.mainQueue())
             .catchToEffect()
             .map(ScrubbingPlayerAction.audioLoaded)
+        
     case .skipTapped(let forward):
         return .none
-        //    case .dataLoaded(let result):
-        //        switch result {
-        //        case .success(let repositories):
-        //            state.repositories = repositories
-        //        case .failure(let error):
-        //            break
-        //        }
-        //        return .none
+        
     case .playPauseTapped(let playerInfo):
         if state.playerInfo.isPlaying {
-            //environment.audioPlayer.stop()
             state.playerInfo.isPlaying = false
-            return environment.audioPlayer.stop().fireAndForget()
+            return environment.audioPlayer.pause().fireAndForget()
         }
         else {
-            //environment.audioPlayer.play()
             state.playerInfo.isPlaying = true
-            return environment.audioPlayer.play().fireAndForget()
+            return environment.audioPlayer
+                  .play()
+                  .catchToEffect(ScrubbingPlayerAction.playingAudio)
+//            return .merge(
+//                Effect.timer(id: TimerId.self, every: 0.5, on: environment.mainRunLoop)
+//                  .map { .timerUpdated($0.date.timeIntervalSince1970 - start.date.timeIntervalSince1970) },
+//
+//                environment.audioPlayerClient
+//                  .play()
+//                  .catchToEffect(VoiceMemoAction.audioPlayerClient)
+//              )
         }
         return .none
         
@@ -70,7 +74,10 @@ let scrubbingPlayerReducer = Reducer<
         case .failure(let error):
             break
         }
-        //return environment.audioPlayer.play().fireAndForget()
+        return .none
+        
+    case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
+        state.playerInfo.isPlaying = false
         return .none
     }
 }

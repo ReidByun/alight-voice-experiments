@@ -32,20 +32,12 @@ extension AudioPlayerClient {
                 }
             },
             openUrl: { url in
-                    .future { callback in
+                    .future { callback in // 구독을 시작하면 클로저가 호출됨.
                         delegate?.player.stop()
                         delegate = nil
                         do {
                             delegate = try AudioPlayerClientDelegate(
-                                url: url,
-                                didFinishPlaying: { flag in
-                                    print("finish playing audio.")
-                                    //delegate = nil
-                                },
-                                decodeErrorDidOccur: { _ in
-                                    callback(.failure(.failedToOpenFile))
-                                    //delegate = nil
-                                }
+                                url: url
                             )
                             
                             print("open url-\(url) v=\(test)")
@@ -58,17 +50,32 @@ extension AudioPlayerClient {
                     }
             },
             play: {
-                .fireAndForget {
-                    print("fire v=\(test)")
-                    test = test + 1
-                    delegate?.player.play()
+                .future { callback in
+                    guard let playerDelegate = delegate else {
+                        callback(.failure(.couldntCreateAudioPlayer))
+                        return
+                    }
+                    //if playerDelegate.didFinishPlaying == nil {
+                        playerDelegate.didFinishPlaying = { flag in
+                            print("finish playing audio.")
+                            callback(.success(.didFinishPlaying(successfully: flag)))
+                        }
+                    //}
+                    //if playerDelegate.decodeErrorDidOccur == nil {
+                        playerDelegate.decodeErrorDidOccur = { _ in
+                            callback(.failure(.decodeErrorDidOccur))
+                        }
+                    //}
+                    
+                    playerDelegate.player.play()
                 }
             },
-            stop: {
+            pause: {
                 .fireAndForget {
                     print("stop fire v=\(test)")
                     test = test + 1
-                    delegate?.player.stop()
+                    delegate?.player.pause()
+                    //delegate?.player.stop()
                 }
             }
         )
@@ -76,34 +83,24 @@ extension AudioPlayerClient {
 }
 
 private class AudioPlayerClientDelegate: NSObject, AVAudioPlayerDelegate {
-    let didFinishPlaying: (Bool) -> Void
-    let decodeErrorDidOccur: (Error?) -> Void
+    var didFinishPlaying: ((Bool) -> Void)? = nil
+    var decodeErrorDidOccur: ((Error?) -> Void)? = nil
     let player: AVAudioPlayer
     
     init(
-        url: URL,
-        didFinishPlaying: @escaping (Bool) -> Void,
-        decodeErrorDidOccur: @escaping (Error?) -> Void
+        url: URL
     ) throws {
-        self.didFinishPlaying = didFinishPlaying
-        self.decodeErrorDidOccur = decodeErrorDidOccur
         self.player = try AVAudioPlayer(contentsOf: url)
         super.init()
         self.player.delegate = self
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        self.didFinishPlaying(flag)
+        self.didFinishPlaying?(flag)
     }
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
-        self.decodeErrorDidOccur(error)
-    }
-    
-    func testPlay() {
-        let r = self.player.play()
-        
-        print(r)
+        self.decodeErrorDidOccur?(error)
     }
 }
 
