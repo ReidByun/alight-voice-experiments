@@ -19,14 +19,14 @@ struct SystemEnvironment<Environment> {
     }
     
     var mainQueue: () -> AnySchedulerOf<DispatchQueue>
-    var audioPlayer: AudioPlayerClient
+    var audioPlayer: AudioEngineClient
     
-    static func live(environment: Environment, audioPlayer: AudioPlayerClient) -> Self {
+    static func live(environment: Environment, audioPlayer: AudioEngineClient) -> Self {
         print("SystemEnvironment init live ttt")
         return Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
     }
     
-    static func dev(environment: Environment, audioPlayer: AudioPlayerClient) -> Self {
+    static func dev(environment: Environment, audioPlayer: AudioEngineClient) -> Self {
         Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
     }
 }

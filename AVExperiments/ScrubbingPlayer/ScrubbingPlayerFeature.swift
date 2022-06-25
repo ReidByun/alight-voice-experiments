@@ -19,11 +19,11 @@ enum ScrubbingPlayerAction: Equatable {
     case audioLoaded(Result<ScrubbingPlayerModel, APIError>)
     case playPauseTapped(ScrubbingPlayerModel)
     case skipTapped(forward: Bool)
-    case playingAudio(Result<AudioPlayerClient.Action, AudioPlayerClient.Failure>)
+    case playingAudio(Result<AudioEngineClient.Action, AudioEngineClient.Failure>)
 }
 
 struct ScrubbingPlayerEnvironment {
-    var audioPlayer: AudioPlayerClient
+    var audioPlayer: AudioEngineClient
 }
 
 let scrubbingPlayerReducer = Reducer<
@@ -55,6 +55,7 @@ let scrubbingPlayerReducer = Reducer<
             state.playerInfo.isPlaying = true
             return environment.audioPlayer
                   .play()
+                  .receive(on: environment.mainQueue())
                   .catchToEffect(ScrubbingPlayerAction.playingAudio)
 //            return .merge(
 //                Effect.timer(id: TimerId.self, every: 0.5, on: environment.mainRunLoop)

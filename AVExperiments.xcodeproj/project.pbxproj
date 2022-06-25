@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30C43ACE2866A4EC00F1E88B /* ScrollableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */; };
+		30C43AD02866A55600F1E88B /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43ACF2866A55600F1E88B /* View+Extension.swift */; };
+		30C43AD32866CAD500F1E88B /* AudioEngineClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */; };
+		30C43AD52866CB0300F1E88B /* AudioEngineClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD42866CB0300F1E88B /* AudioEngineClient+Live.swift */; };
+		30C43AD72866CF4800F1E88B /* GenScrubbingSourceNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD62866CF4800F1E88B /* GenScrubbingSourceNode.swift */; };
 		30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */; };
 		30F6B44A284AF1E0007C3440 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B449284AF1E0007C3440 /* Assets.xcassets */; };
 		30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B44C284AF1E0007C3440 /* Preview Assets.xcassets */; };
@@ -48,6 +53,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableView.swift; sourceTree = "<group>"; };
+		30C43ACF2866A55600F1E88B /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineClient.swift; sourceTree = "<group>"; };
+		30C43AD42866CB0300F1E88B /* AudioEngineClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioEngineClient+Live.swift"; sourceTree = "<group>"; };
+		30C43AD62866CF4800F1E88B /* GenScrubbingSourceNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenScrubbingSourceNode.swift; sourceTree = "<group>"; };
 		30F6B442284AF1DE007C3440 /* AVExperiments.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVExperiments.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVExperimentsApp.swift; sourceTree = "<group>"; };
 		30F6B449284AF1E0007C3440 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -99,6 +109,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		30C43ACC2866A4DA00F1E88B /* ScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */,
+			);
+			path = ScrollView;
+			sourceTree = "<group>";
+		};
+		30C43AD12866CAB600F1E88B /* AudioEngineClient */ = {
+			isa = PBXGroup;
+			children = (
+				30C43AD62866CF4800F1E88B /* GenScrubbingSourceNode.swift */,
+				30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */,
+				30C43AD42866CB0300F1E88B /* AudioEngineClient+Live.swift */,
+			);
+			path = AudioEngineClient;
+			sourceTree = "<group>";
+		};
 		30F6B439284AF1DE007C3440 = {
 			isa = PBXGroup;
 			children = (
@@ -179,6 +207,8 @@
 		30F6B474284AFC10007C3440 /* ScrubbingPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				30C43AD12866CAB600F1E88B /* AudioEngineClient */,
+				30C43ACC2866A4DA00F1E88B /* ScrollView */,
 				30F6B48D284E4979007C3440 /* AudioPlayerClient */,
 				30F6B47F284B2557007C3440 /* UtilExt */,
 				30F6B477284AFD36007C3440 /* ScrubbingPlayerFeature.swift */,
@@ -195,6 +225,7 @@
 				30F6B480284B256E007C3440 /* Image+Extension.swift */,
 				30F6B481284B256E007C3440 /* PlayerTime.swift */,
 				30F6B492284E555C007C3440 /* APIError.swift */,
+				30C43ACF2866A55600F1E88B /* View+Extension.swift */,
 			);
 			path = UtilExt;
 			sourceTree = "<group>";
@@ -349,11 +380,16 @@
 				30F6B48A284E45D5007C3440 /* RootFeature.swift in Sources */,
 				30F6B483284B256E007C3440 /* PlayerTime.swift in Sources */,
 				30F6B47C284AFD57007C3440 /* ScrubbingPlayerModel.swift in Sources */,
+				30C43AD72866CF4800F1E88B /* GenScrubbingSourceNode.swift in Sources */,
 				30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */,
 				30F6B482284B256E007C3440 /* Image+Extension.swift in Sources */,
+				30C43ACE2866A4EC00F1E88B /* ScrollableView.swift in Sources */,
 				30F6B476284AFD04007C3440 /* ScrubbingPlayerView.swift in Sources */,
+				30C43AD02866A55600F1E88B /* View+Extension.swift in Sources */,
 				30F6B47A284AFD48007C3440 /* ScrubbingPlayerEffects.swift in Sources */,
+				30C43AD32866CAD500F1E88B /* AudioEngineClient.swift in Sources */,
 				30F6B48F284E49BB007C3440 /* AudioPlayerClient.swift in Sources */,
+				30C43AD52866CB0300F1E88B /* AudioEngineClient+Live.swift in Sources */,
 				30F6B478284AFD36007C3440 /* ScrubbingPlayerFeature.swift in Sources */,
 				30F6B47E284B233D007C3440 /* SystemEnvironment.swift in Sources */,
 				30F6B491284E49DA007C3440 /* AudioPlayerClient+Live.swift in Sources */,

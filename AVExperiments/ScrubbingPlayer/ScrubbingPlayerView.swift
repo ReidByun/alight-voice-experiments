@@ -22,25 +22,6 @@ struct ScrubbingPlayerView: View {
                     .padding()
                     .layoutPriority(1)
                 
-                Spacer()
-                
-                Button {
-                    print("play / pause")
-                    viewStore.send(.playPauseTapped(viewStore.playerInfo))
-                } label: {
-                    //                ZStack {
-                    //                    Color.blue
-                    //                        .frame(
-                    //                            width: 10,
-                    //                            height: 35 * CGFloat(viewModel.meterLevel))
-                    //                        .opacity(0.5)
-                    //
-                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
-                    //                }
-                }
-                .frame(width: 40)
-                .font(.system(size: 45))
-                
                 PlayerControlView
                     .padding(.bottom)
             }
@@ -52,27 +33,32 @@ struct ScrubbingPlayerView: View {
     
     
     private var PlayerControlView: some View {
-        VStack {
-            //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
-            //                .padding(.bottom, 8)
-            //                .frame(height: 40)
-            
-            HStack {
-                //Text(viewModel.playerTime.elapsedText)
+        WithViewStore(self.store) { viewStore in
+            VStack {
+                //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
+                //                .padding(.bottom, 8)
+                //                .frame(height: 40)
+                PlaybackScrollView(progress: viewStore.playerInfo.playerProgress)
+                    .padding(.bottom)
+                    
                 
-                Spacer()
+                HStack {
+                    //Text(viewModel.playerTime.elapsedText)
+                    
+                    Spacer()
+                    
+                    //Text(viewModel.playerTime.remainingText)
+                }
+                .font(.system(size: 14, weight: .semibold))
                 
-                //Text(viewModel.playerTime.remainingText)
+                
+                AudioControlButtonsView
+                //.disabled(!viewModel.isPlayerReady)
+                    .padding(.bottom)
+                
             }
-            .font(.system(size: 14, weight: .semibold))
-            
-            
-            AudioControlButtonsView
-            //.disabled(!viewModel.isPlayerReady)
-                .padding(.bottom)
-            
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
     
     private var AudioControlButtonsView: some View {
@@ -92,17 +78,9 @@ struct ScrubbingPlayerView: View {
                 
                 Button {
                     print("play / pause")
-                    //                viewStore.send(.playPauseTapped(viewStore.playerInfo))
+                    viewStore.send(.playPauseTapped(viewStore.playerInfo))
                 } label: {
-                    //                ZStack {
-                    //                    Color.blue
-                    //                        .frame(
-                    //                            width: 10,
-                    //                            height: 35 * CGFloat(viewModel.meterLevel))
-                    //                        .opacity(0.5)
-                    //
-                    //                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
-                    //                }
+                    viewStore.playerInfo.isPlaying ? Image.pause : Image.play
                 }
                 .frame(width: 40)
                 .font(.system(size: 45))
@@ -145,6 +123,75 @@ fileprivate struct SliderBarView: View {
             Text("\(value)")
                 .foregroundColor(isEditing ? .red : .blue)
         }
+    }
+}
+
+struct PlaybackScrollView: View {
+    @State private var contentOffset: CGPoint = .zero
+    @State private var screenSize: CGRect = UIScreen.main.bounds
+    @State private var orientation = UIDeviceOrientation.unknown
+    @State var scrollVelocity: CGFloat = CGFloat(0)
+    var progress: Double
+    
+    var test: Bool = false
+
+    var body: some View {
+        let dragging = DragGesture(minimumDistance: 0, coordinateSpace: .global).onChanged { value in
+//            isDragging = true
+//            dragLocation = value.location
+//            guard let xPos = dragLocation?.x else {
+//                isDragging = false
+//                return
+//            }
+//
+//            playingBarPos = rectSize.width - calibrateXpos(xPos)
+//            timeInDragging = Double(calcTime(from: xPos))
+            print("dragging")
+        }
+        
+        VStack {
+            Text("off: \(Int(contentOffset.x))")
+            ZStack {
+                ScrollableView(self.$contentOffset, animationDuration: 0.5, axis: .horizontal, scrollVelocity: $scrollVelocity) {
+                    ZStack {
+                        Color.clear
+                            .frame(width: screenSize.width*2, height: 60)
+                        HStack(spacing: 0) {
+                            Color.black
+                                .frame(width: screenSize.width/2, height: 60)
+                            Color.green
+                                .frame(width: screenSize.width, height: 60)
+                            Color.black
+                                .frame(width: screenSize.width/2, height: 60)
+                                .id(3)  //Set the Id
+                        }
+                    }
+                }
+                
+                VStack(spacing: 0) {
+                    Color.black
+                        .frame(width: 3, height: 100)
+                }
+            }
+        }
+        .ignoresSafeArea()
+        .onRotate { newOrientation in
+            orientation = newOrientation
+            screenSize = UIScreen.main.bounds
+        }
+        .onChange(of: progress) { currentProgress in
+            self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
+        }
+        
+        
+    }
+    
+    func progressToOffset(progress: Double, width: Double)-> Double {
+        return progress / 100.0 * width
+    }
+    
+    func offsetToProgress(offset: Double, width: Double)-> Double {
+        return offset / width * 100.0
     }
 }
 
