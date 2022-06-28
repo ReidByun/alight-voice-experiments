@@ -22,7 +22,7 @@ struct SystemEnvironment<Environment> {
     var audioPlayer: AudioEngineClient
     
     static func live(environment: Environment, audioPlayer: AudioEngineClient) -> Self {
-        print("SystemEnvironment init live ttt")
+        //print("SystemEnvironment init live ttt")
         return Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
     }
     

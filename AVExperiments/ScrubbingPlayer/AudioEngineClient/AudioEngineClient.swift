@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Foundation
+import AVFoundation
 
 struct AudioEngineClient {
     var setSession: ()->()
@@ -14,6 +15,7 @@ struct AudioEngineClient {
     var play: () -> Effect<Action, Failure>
 //    var play: () -> Effect<Never, Never>
     var pause: () -> Effect<Never, Never>
+    var currentFrame: () -> Effect<AVAudioFramePosition, Never>
     
     enum Action: Equatable {
         case didFinishPlaying(successfully: Bool)

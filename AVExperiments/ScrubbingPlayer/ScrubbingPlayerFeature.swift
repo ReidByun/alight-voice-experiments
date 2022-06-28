@@ -12,14 +12,18 @@ import ComposableArchitecture
 
 struct ScrubbingPlayerState: Equatable {
     var playerInfo: ScrubbingPlayerModel = ScrubbingPlayerModel()
+    var isTimearActive = false
 }
 
 enum ScrubbingPlayerAction: Equatable {
     case onAppear
+    case onDisappear
     case audioLoaded(Result<ScrubbingPlayerModel, APIError>)
     case playPauseTapped(ScrubbingPlayerModel)
     case skipTapped(forward: Bool)
     case playingAudio(Result<AudioEngineClient.Action, AudioEngineClient.Failure>)
+    case activeTimer(on: Bool)
+    case updateDisplay
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -31,6 +35,8 @@ let scrubbingPlayerReducer = Reducer<
     ScrubbingPlayerAction,
     SystemEnvironment<ScrubbingPlayerEnvironment>
 > { state, action, environment in
+    enum TimerId {}
+    
     switch action {
     case .onAppear:
         environment.audioPlayer.setSession()
@@ -42,6 +48,10 @@ let scrubbingPlayerReducer = Reducer<
             .receive(on: environment.mainQueue())
             .catchToEffect()
             .map(ScrubbingPlayerAction.audioLoaded)
+        
+    case .onDisappear:
+        return Effect(value: .activeTimer(on: false))
+            .eraseToEffect()
         
     case .skipTapped(let forward):
         return .none
@@ -57,16 +67,7 @@ let scrubbingPlayerReducer = Reducer<
                   .play()
                   .receive(on: environment.mainQueue())
                   .catchToEffect(ScrubbingPlayerAction.playingAudio)
-//            return .merge(
-//                Effect.timer(id: TimerId.self, every: 0.5, on: environment.mainRunLoop)
-//                  .map { .timerUpdated($0.date.timeIntervalSince1970 - start.date.timeIntervalSince1970) },
-//
-//                environment.audioPlayerClient
-//                  .play()
-//                  .catchToEffect(VoiceMemoAction.audioPlayerClient)
-//              )
         }
-        return .none
         
     case .audioLoaded(let result):
         switch result {
@@ -75,10 +76,34 @@ let scrubbingPlayerReducer = Reducer<
         case .failure(let error):
             break
         }
-        return .none
+        return Effect(value: .activeTimer(on: true))
+            .eraseToEffect()
         
     case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
         state.playerInfo.isPlaying = false
         return .none
+        
+    case .updateDisplay:
+        environment.audioPlayer
+              .currentFrame()
+              .sink { currentFrame in
+                  print(currentFrame)
+              }
+        
+        return .none
+        
+    case .activeTimer(let on):
+        if on && !state.isTimearActive {
+            state.isTimearActive = true
+            return Effect.timer(
+                id: TimerId.self,
+                every: 0.02,
+                on: environment.mainQueue())
+            .map { _ in .updateDisplay }
+        }
+        else {
+            state.isTimearActive = false
+            return !on ? .cancel(id: TimerId.self) : .none
+        }
     }
 }

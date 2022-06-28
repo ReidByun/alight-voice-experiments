@@ -12,6 +12,7 @@
 		30C43AD32866CAD500F1E88B /* AudioEngineClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */; };
 		30C43AD52866CB0300F1E88B /* AudioEngineClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD42866CB0300F1E88B /* AudioEngineClient+Live.swift */; };
 		30C43AD72866CF4800F1E88B /* GenScrubbingSourceNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD62866CF4800F1E88B /* GenScrubbingSourceNode.swift */; };
+		30C43AD92869ADDC00F1E88B /* AudioInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD82869ADDC00F1E88B /* AudioInfo.swift */; };
 		30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */; };
 		30F6B44A284AF1E0007C3440 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B449284AF1E0007C3440 /* Assets.xcassets */; };
 		30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30F6B44C284AF1E0007C3440 /* Preview Assets.xcassets */; };
@@ -58,6 +59,7 @@
 		30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineClient.swift; sourceTree = "<group>"; };
 		30C43AD42866CB0300F1E88B /* AudioEngineClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioEngineClient+Live.swift"; sourceTree = "<group>"; };
 		30C43AD62866CF4800F1E88B /* GenScrubbingSourceNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenScrubbingSourceNode.swift; sourceTree = "<group>"; };
+		30C43AD82869ADDC00F1E88B /* AudioInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioInfo.swift; sourceTree = "<group>"; };
 		30F6B442284AF1DE007C3440 /* AVExperiments.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AVExperiments.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30F6B445284AF1DE007C3440 /* AVExperimentsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVExperimentsApp.swift; sourceTree = "<group>"; };
 		30F6B449284AF1E0007C3440 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				30F6B475284AFD04007C3440 /* ScrubbingPlayerView.swift */,
 				30F6B479284AFD48007C3440 /* ScrubbingPlayerEffects.swift */,
 				30F6B47B284AFD57007C3440 /* ScrubbingPlayerModel.swift */,
+				30C43AD82869ADDC00F1E88B /* AudioInfo.swift */,
 			);
 			path = ScrubbingPlayer;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				30F6B48A284E45D5007C3440 /* RootFeature.swift in Sources */,
 				30F6B483284B256E007C3440 /* PlayerTime.swift in Sources */,
 				30F6B47C284AFD57007C3440 /* ScrubbingPlayerModel.swift in Sources */,
+				30C43AD92869ADDC00F1E88B /* AudioInfo.swift in Sources */,
 				30C43AD72866CF4800F1E88B /* GenScrubbingSourceNode.swift in Sources */,
 				30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */,
 				30F6B482284B256E007C3440 /* Image+Extension.swift in Sources */,

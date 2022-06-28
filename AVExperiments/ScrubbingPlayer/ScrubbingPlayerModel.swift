@@ -29,25 +29,23 @@ struct ScrubbingPlayerModel: Equatable {
     
     var scrubbingSourceNode: GenScrubbingSourceNode!
     
-    
     var seekFrame: AVAudioFramePosition = 0
     
-    
-    //    var playbackMode = PlaybackMode.notPlaying
-    //    enum PlaybackMode: Equatable {
-    //        case notPlaying
-    //        case playing(progress: Double)
-    //
-    //        var isPlaying: Bool {
-    //            if case .playing = self { return true }
-    //            return false
-    //        }
-    //
-    //        var progress: Double? {
-    //            if case let .playing(progress) = self { return progress }
-    //            return nil
-    //        }
-    //    }
+    var playbackMode = PlaybackMode.notPlaying
+    enum PlaybackMode: Equatable {
+        case notPlaying
+        case playing(progress: Double)
+        
+        var isPlaying: Bool {
+            if case .playing = self { return true }
+            return false
+        }
+        
+        var progress: Double? {
+            if case let .playing(progress) = self { return progress }
+            return nil
+        }
+    }
 }
 
 extension ScrubbingPlayerModel: Identifiable {

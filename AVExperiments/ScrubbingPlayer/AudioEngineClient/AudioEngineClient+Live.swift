@@ -37,7 +37,12 @@ extension AudioEngineClient {
                                 url: url
                             )
                             
-                            callback(.success(ScrubbingPlayerModel()))
+                            guard let audioInfo = delegate?.audioInfo else {
+                                callback(.failure(.failedToOpenFile))
+                                return
+                            }
+                            
+                            callback(.success(audioInfo))
                         } catch {
                             callback(.failure(.failedToOpenFile))
                         }
@@ -52,6 +57,7 @@ extension AudioEngineClient {
                     //if playerDelegate.didFinishPlaying == nil {
                         playerDelegate.didFinishPlaying = { flag in
                             print("finish playing audio.")
+                            delegate?.pause()
                             callback(.success(.didFinishPlaying(successfully: flag)))
                         }
                     //}
@@ -69,6 +75,17 @@ extension AudioEngineClient {
                     delegate?.pause()
                     //delegate?.player.stop()
                 }
+            },
+            currentFrame: {
+                .future {callback in
+                    guard let delegate = delegate else {
+                        callback(.success(0))
+                        return
+                    }
+                    
+                    callback(.success(delegate.currentFrame))
+
+                }
             }
         )
     }
@@ -80,9 +97,20 @@ private class AudioEngineClientWrapper: NSObject {
     
     let engine: AVAudioEngine
     let player: AVAudioPlayerNode
-    var audioInfo: ScrubbingPlayerModel
-    var needsFileScheduled = true
-    var url: URL?
+    private(set) var audioInfo: ScrubbingPlayerModel
+    private(set) var needsFileScheduled = true
+    private(set) var url: URL?
+    
+    var currentFrame: AVAudioFramePosition {
+        guard
+            let lastRenderTime = player.lastRenderTime,
+            let playerTime = player.playerTime(forNodeTime: lastRenderTime)
+        else {
+            return 0
+        }
+        
+        return playerTime.sampleTime
+    }
     
     init(
         url: URL
