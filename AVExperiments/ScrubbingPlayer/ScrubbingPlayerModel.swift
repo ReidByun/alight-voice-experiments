@@ -21,6 +21,7 @@ struct ScrubbingPlayerModel: Equatable {
     
     var isPlayerReady = false
     var playerTime: PlayerTime = .zero
+    var testTime = ""
     
     private var scrubbingInPlaying = false
     

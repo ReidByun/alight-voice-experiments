@@ -46,13 +46,14 @@ struct ScrubbingPlayerView: View {
                     
                 
                 HStack {
-                    //Text(viewModel.playerTime.elapsedText)
+                    Text(viewStore.playerInfo.playerTime.elapsedText)
                     
                     Spacer()
                     
-                    //Text(viewModel.playerTime.remainingText)
+                    Text(viewStore.playerInfo.playerTime.remainingText)
                 }
                 .font(.system(size: 14, weight: .semibold))
+                .padding()
                 
                 
                 AudioControlButtonsView

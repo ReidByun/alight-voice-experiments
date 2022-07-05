@@ -94,8 +94,12 @@ let scrubbingPlayerReducer = Reducer<
                 state.playerInfo.prevProgress = state.playerInfo.playerProgress
                 state.playerInfo.playerProgress = progress
             }
+            
+            let time = Double(frame) / Double(state.playerInfo.audioSampleRate)
+            state.playerInfo.playerTime = PlayerTime(
+                elapsedTime: time,
+                remainingTime: state.playerInfo.audioLengthSeconds - time)
         }
-        
         
         return .none
         
