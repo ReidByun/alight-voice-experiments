@@ -41,7 +41,7 @@ struct ScrubbingPlayerView: View {
                 //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
                 //                .padding(.bottom, 8)
                 //                .frame(height: 40)
-                PlaybackScrollView(progress: viewStore.playerInfo.playerProgress)
+                PlaybackScrollView(store: self.store, progress: viewStore.playerInfo.playerProgress)
                     .padding(.bottom)
                     
                 
@@ -60,7 +60,7 @@ struct ScrubbingPlayerView: View {
                     .padding(.bottom)
                 
             }
-            .padding(.horizontal)
+            //.padding(.horizontal)
         }
     }
     
@@ -130,63 +130,68 @@ fileprivate struct SliderBarView: View {
 }
 
 struct PlaybackScrollView: View {
+    let store: Store<ScrubbingPlayerState, ScrubbingPlayerAction>
+    
     @State private var contentOffset: CGPoint = .zero
     @State private var screenSize: CGRect = UIScreen.main.bounds
     @State private var orientation = UIDeviceOrientation.unknown
     @State var scrollVelocity: CGFloat = CGFloat(0)
     var progress: Double
     
-    var test: Bool = false
+    @State var nowScrubbing: Bool = false
 
     var body: some View {
-        let dragging = DragGesture(minimumDistance: 0, coordinateSpace: .global).onChanged { value in
-//            isDragging = true
-//            dragLocation = value.location
-//            guard let xPos = dragLocation?.x else {
-//                isDragging = false
-//                return
-//            }
-//
-//            playingBarPos = rectSize.width - calibrateXpos(xPos)
-//            timeInDragging = Double(calcTime(from: xPos))
-            print("dragging")
-        }
-        
-        VStack {
-            Text("off: \(Int(contentOffset.x))")
-            ZStack {
-                ScrollableView(self.$contentOffset, animationDuration: 0.5, axis: .horizontal, scrollVelocity: $scrollVelocity) {
-                    ZStack {
-                        Color.clear
-                            .frame(width: screenSize.width*2, height: 60)
-                        HStack(spacing: 0) {
-                            Color.black
-                                .frame(width: screenSize.width/2, height: 60)
-                            Color.green
-                                .frame(width: screenSize.width, height: 60)
-                            Color.black
-                                .frame(width: screenSize.width/2, height: 60)
-                                .id(3)  //Set the Id
+        WithViewStore(self.store) { viewStore in
+            VStack {
+                Text("off: \(Int(contentOffset.x))")
+                ZStack {
+                    ScrollableView(
+                        self.$contentOffset,
+                        animationDuration: 0.5,
+                        axis: .horizontal,
+                        scrollVelocity: $scrollVelocity,
+                        beginDragging: { self.nowScrubbing = true },
+                        endDragging: {_ in self.nowScrubbing = false }) {
+                        ZStack {
+                            Color.clear
+                                .frame(width: screenSize.width*2, height: 60)
+                            HStack(spacing: 0) {
+                                Color.black
+                                    .frame(width: screenSize.width/2, height: 60)
+                                Color.green
+                                    .frame(width: screenSize.width, height: 60)
+                                Color.black
+                                    .frame(width: screenSize.width/2, height: 60)
+                                    .id(3)  //Set the Id
+                            }
                         }
                     }
+                    
+                    VStack(spacing: 0) {
+                        Color.black
+                            .frame(width: 3, height: 100)
+                    }
                 }
+            }
+            .onRotate { newOrientation in
+                orientation = newOrientation
+                screenSize = UIScreen.main.bounds
+            }
+            .onChange(of: progress) { currentProgress in
+                self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
+                print(progress)
+            }
+            .onChange(of: nowScrubbing) { [nowScrubbing] newStateScrubbing in
+                print("scrubbing: \(newStateScrubbing) \(nowScrubbing)")
                 
-                VStack(spacing: 0) {
-                    Color.black
-                        .frame(width: 3, height: 100)
+                if nowScrubbing != newStateScrubbing && !newStateScrubbing {
+                    let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
+                    let seekTime = progressToTime(progress: progress, totalTime: viewStore.playerInfo.audioLengthSeconds)
+                    print("seek time \(seekTime)")
+                    viewStore.send(.seek(time: seekTime))
                 }
             }
         }
-        .ignoresSafeArea()
-        .onRotate { newOrientation in
-            orientation = newOrientation
-            screenSize = UIScreen.main.bounds
-        }
-        .onChange(of: progress) { currentProgress in
-            self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
-        }
-        
-        
     }
     
     func progressToOffset(progress: Double, width: Double)-> Double {
@@ -195,6 +200,10 @@ struct PlaybackScrollView: View {
     
     func offsetToProgress(offset: Double, width: Double)-> Double {
         return offset / width * 100.0
+    }
+    
+    func progressToTime(progress: Double, totalTime: Double)-> Double {
+        return progress / 100.0 * totalTime
     }
 }
 

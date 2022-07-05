@@ -26,6 +26,7 @@ struct ScrubbingPlayerModel: Equatable {
     
     var isPlaying = false
     var playerProgress: Double = 0
+    var prevProgress: Double = -1
     
     var scrubbingSourceNode: GenScrubbingSourceNode!
     

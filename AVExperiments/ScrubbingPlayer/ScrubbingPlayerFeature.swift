@@ -24,6 +24,7 @@ enum ScrubbingPlayerAction: Equatable {
     case playingAudio(Result<AudioEngineClient.Action, AudioEngineClient.Failure>)
     case activeTimer(on: Bool)
     case updateDisplay
+    case seek(time: Double)
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -81,14 +82,20 @@ let scrubbingPlayerReducer = Reducer<
         
     case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
         state.playerInfo.isPlaying = false
-        return .none
+        return environment.audioPlayer.stop().fireAndForget()
         
     case .updateDisplay:
-        environment.audioPlayer
-              .currentFrame()
-              .sink { currentFrame in
-                  print(currentFrame)
-              }
+        if state.playerInfo.isPlaying {
+            let frame = environment.audioPlayer.playbackPosition()
+            let progress = Double(frame) / Double(state.playerInfo.audioLengthSamples) * 100.0
+            
+            if state.playerInfo.playerProgress != progress {
+                //print("\(state.playerInfo.playerProgress) -> \(frame) / \(progress)")
+                state.playerInfo.prevProgress = state.playerInfo.playerProgress
+                state.playerInfo.playerProgress = progress
+            }
+        }
+        
         
         return .none
         
@@ -105,5 +112,9 @@ let scrubbingPlayerReducer = Reducer<
             state.isTimearActive = false
             return !on ? .cancel(id: TimerId.self) : .none
         }
+        
+    case .seek(let time):
+        
+        return .none
     }
 }

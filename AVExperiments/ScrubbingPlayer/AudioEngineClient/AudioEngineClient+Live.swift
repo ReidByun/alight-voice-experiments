@@ -76,6 +76,12 @@ extension AudioEngineClient {
                     //delegate?.player.stop()
                 }
             },
+            stop: {
+                .fireAndForget {
+                    delegate?.stop()
+                    //delegate?.player.stop()
+                }
+            },
             currentFrame: {
                 .future {callback in
                     guard let delegate = delegate else {
@@ -86,7 +92,15 @@ extension AudioEngineClient {
                     callback(.success(delegate.currentFrame))
 
                 }
+            },
+            playbackPosition: {
+                guard let delegate = delegate else {
+                    return 0
+                }
+                
+                return delegate.currentFrame
             }
+
         )
     }
 }
@@ -218,6 +232,10 @@ private class AudioEngineClientWrapper: NSObject {
     
     func pause() {
         player.pause()
+    }
+    
+    func stop() {
+        player.stop()
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
