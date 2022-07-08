@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30B848302874367B0073D693 /* ScrubbingPlayerCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B8482F2874367B0073D693 /* ScrubbingPlayerCalculation.swift */; };
+		30B848322875843E0073D693 /* roses.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30B848312875843E0073D693 /* roses.mp3 */; };
 		30C43ACE2866A4EC00F1E88B /* ScrollableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */; };
 		30C43AD02866A55600F1E88B /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43ACF2866A55600F1E88B /* View+Extension.swift */; };
 		30C43AD32866CAD500F1E88B /* AudioEngineClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */; };
@@ -54,6 +56,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		30B8482F2874367B0073D693 /* ScrubbingPlayerCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerCalculation.swift; sourceTree = "<group>"; };
+		30B848312875843E0073D693 /* roses.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = roses.mp3; sourceTree = "<group>"; };
 		30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableView.swift; sourceTree = "<group>"; };
 		30C43ACF2866A55600F1E88B /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		30C43AD22866CAD500F1E88B /* AudioEngineClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineClient.swift; sourceTree = "<group>"; };
@@ -157,6 +161,7 @@
 				30F6B473284AFC06007C3440 /* Share */,
 				30F6B474284AFC10007C3440 /* ScrubbingPlayer */,
 				30F6B449284AF1E0007C3440 /* Assets.xcassets */,
+				30B848312875843E0073D693 /* roses.mp3 */,
 				30F6B484284B25B6007C3440 /* IU-5s.mp3 */,
 				30F6B485284B25B6007C3440 /* IU-12s.mp3 */,
 				30F6B44B284AF1E0007C3440 /* Preview Content */,
@@ -218,6 +223,7 @@
 				30F6B479284AFD48007C3440 /* ScrubbingPlayerEffects.swift */,
 				30F6B47B284AFD57007C3440 /* ScrubbingPlayerModel.swift */,
 				30C43AD82869ADDC00F1E88B /* AudioInfo.swift */,
+				30B8482F2874367B0073D693 /* ScrubbingPlayerCalculation.swift */,
 			);
 			path = ScrubbingPlayer;
 			sourceTree = "<group>";
@@ -354,6 +360,7 @@
 			files = (
 				30F6B44D284AF1E0007C3440 /* Preview Assets.xcassets in Resources */,
 				30F6B487284B25B6007C3440 /* IU-12s.mp3 in Resources */,
+				30B848322875843E0073D693 /* roses.mp3 in Resources */,
 				30F6B486284B25B6007C3440 /* IU-5s.mp3 in Resources */,
 				30F6B44A284AF1E0007C3440 /* Assets.xcassets in Resources */,
 			);
@@ -396,6 +403,7 @@
 				30C43AD52866CB0300F1E88B /* AudioEngineClient+Live.swift in Sources */,
 				30F6B478284AFD36007C3440 /* ScrubbingPlayerFeature.swift in Sources */,
 				30F6B47E284B233D007C3440 /* SystemEnvironment.swift in Sources */,
+				30B848302874367B0073D693 /* ScrubbingPlayerCalculation.swift in Sources */,
 				30F6B491284E49DA007C3440 /* AudioPlayerClient+Live.swift in Sources */,
 				30F6B48C284E45F3007C3440 /* RootView.swift in Sources */,
 				30F6B493284E555C007C3440 /* APIError.swift in Sources */,

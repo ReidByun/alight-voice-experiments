@@ -97,8 +97,26 @@ extension AudioEngineClient {
                 guard let delegate = delegate else {
                     return 0
                 }
-                
+
                 return delegate.currentFrame
+            },
+            seek: { seekFrame in
+                .future { callback in
+                    guard let playerDelegate = delegate else {
+                        callback(.failure(.couldntCreateAudioPlayer))
+                        return
+                    }
+                    
+                    playerDelegate.seek(to: seekFrame) { success in
+                        if success {
+                            callback(.success(true))
+                        }
+                        else {
+                            callback(.failure(.decodeErrorDidOccur))
+                        }
+                        
+                    }
+                }
             }
 
         )
@@ -115,6 +133,8 @@ private class AudioEngineClientWrapper: NSObject {
     private(set) var needsFileScheduled = true
     private(set) var url: URL?
     
+    private var isSeekingNow = false
+    
     var currentFrame: AVAudioFramePosition {
         guard
             let lastRenderTime = player.lastRenderTime,
@@ -122,7 +142,7 @@ private class AudioEngineClientWrapper: NSObject {
         else {
             return 0
         }
-        
+        //print("last Render(\(lastRenderTime)), playerTime(\(playerTime))")
         return playerTime.sampleTime
     }
     
@@ -214,8 +234,10 @@ private class AudioEngineClientWrapper: NSObject {
         //player.scheduleBuffer(self.buffer) {
             print("play done.!!!")
 
-            self.needsFileScheduled = true
-            self.didFinishPlaying?(true)
+            if !self.isSeekingNow {
+                self.needsFileScheduled = true
+                self.didFinishPlaying?(true)
+            }
         }
     }
     
@@ -238,8 +260,67 @@ private class AudioEngineClientWrapper: NSObject {
         player.stop()
     }
     
+    func seek(to seekFramePosition: AVAudioFramePosition, completion: @escaping (Bool)->Void ) {
+        guard let audioFile = audioInfo.audioFile else {
+            completion(false)
+            return
+        }
+        
+        if seekFramePosition < audioInfo.audioLengthSamples {
+            isSeekingNow = true
+            
+            let wasPlaying = player.isPlaying
+            player.stop()
+            
+            needsFileScheduled = false
+            
+            let frameCount = AVAudioFrameCount(audioInfo.audioLengthSamples - seekFramePosition)
+            print("\(audioInfo.audioLengthSamples), <- \(frameCount) + \(seekFramePosition)")
+            
+            let test = AVAudioFramePosition(Double(seekFramePosition) + (44100 * 30))
+            
+            player.scheduleSegment(
+                audioFile,
+                startingFrame: seekFramePosition,
+                frameCount: frameCount,
+                at: nil
+            ) {
+                print("seek done from ScheduleSegment")
+                self.needsFileScheduled = true
+                //self.player.play()
+                //self.scheduleAudioBuffer()
+            }
+            
+////            let seekTime = AVAudioTime(hostTime: mach_absolute_time(), sampleTime: seekFramePosition, atRate: audioInfo.audioSampleRate)
+//            let seekTime = AVAudioTime(sampleTime: seekFramePosition, atRate: audioInfo.audioSampleRate)
+//
+//            print("seek-> \(seekTime) -> (\(Double(seekFramePosition) / audioInfo.audioSampleRate)) ")
+//            player.scheduleBuffer(audioInfo.buffer, at: seekTime, options: [.interruptsAtLoop]) {
+//                print("play done from seek")
+////                if !self.isSeekingNow {
+////                    self.needsFileScheduled = true
+////                    self.didFinishPlaying?(true)
+////                }
+//            }
+            
+            if wasPlaying {
+                print("seek play again")
+                self.player.play()
+            }
+            
+            print("seek call completion")
+            isSeekingNow = false
+            completion(true)
+        }
+        else {
+            completion(true)
+        }
+    }
+    
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        self.didFinishPlaying?(flag)
+        if !isSeekingNow {
+            self.didFinishPlaying?(flag)
+        }
     }
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {

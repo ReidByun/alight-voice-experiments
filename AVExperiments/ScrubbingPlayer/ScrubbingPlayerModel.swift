@@ -31,6 +31,7 @@ struct ScrubbingPlayerModel: Equatable {
     
     var scrubbingSourceNode: GenScrubbingSourceNode!
     
+    var currentPosition: AVAudioFramePosition = 0
     var seekFrame: AVAudioFramePosition = 0
     
     var playbackMode = PlaybackMode.notPlaying

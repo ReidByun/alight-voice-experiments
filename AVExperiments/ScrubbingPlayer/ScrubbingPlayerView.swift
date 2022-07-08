@@ -73,6 +73,7 @@ struct ScrubbingPlayerView: View {
                 Button {
                     //viewModel.skip(forwards: false)
                     print("backward")
+                    viewStore.send(.seek(time: -10, relative: true))
                 } label: {
                     Image.backward
                 }
@@ -93,6 +94,7 @@ struct ScrubbingPlayerView: View {
                 
                 Button {
                     print("forward")
+                    viewStore.send(.seek(time: 10, relative: true))
                 } label: {
                     Image.forward
                 }
@@ -179,17 +181,23 @@ struct PlaybackScrollView: View {
                 screenSize = UIScreen.main.bounds
             }
             .onChange(of: progress) { currentProgress in
-                self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
-                print(progress)
+                if !nowScrubbing {
+                    //print("currentView Progress - \(currentProgress)")
+                    self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
+                    //print(progress)
+                }
             }
             .onChange(of: nowScrubbing) { [nowScrubbing] newStateScrubbing in
                 print("scrubbing: \(newStateScrubbing) \(nowScrubbing)")
+                let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
+                if nowScrubbing {
+                    self.contentOffset = CGPoint(x: progressToOffset(progress: progress, width: screenSize.width), y: 0)
+                }
                 
                 if nowScrubbing != newStateScrubbing && !newStateScrubbing {
-                    let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
                     let seekTime = progressToTime(progress: progress, totalTime: viewStore.playerInfo.audioLengthSeconds)
                     print("seek time \(seekTime)")
-                    viewStore.send(.seek(time: seekTime))
+                    viewStore.send(.seek(time: seekTime, relative: false))
                 }
             }
         }

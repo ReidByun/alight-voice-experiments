@@ -18,6 +18,7 @@ struct AudioEngineClient {
     var stop: () -> Effect<Never, Never>
     var currentFrame: () -> Effect<AVAudioFramePosition, Never>
     var playbackPosition: () -> AVAudioFramePosition
+    var seek: (AVAudioFramePosition)-> Effect<Bool, Failure>
     
     enum Action: Equatable {
         case didFinishPlaying(successfully: Bool)
