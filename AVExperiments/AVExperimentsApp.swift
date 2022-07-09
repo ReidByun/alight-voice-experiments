@@ -10,13 +10,13 @@ import ComposableArchitecture
 
 @main
 struct AVExperimentsApp: App {
-    var body: some Scene {
-        WindowGroup {
-            RootView(
-                store: Store(
-                    initialState: RootState(),
-                    reducer: rootReducer,
-                    environment: .live(environment: RootEnvironment(), audioPlayer: .livePlayerClient)))
-        }
+  var body: some Scene {
+    WindowGroup {
+      RootView(
+        store: Store(
+          initialState: RootState(),
+          reducer: rootReducer,
+          environment: .live(environment: RootEnvironment(), audioPlayer: .livePlayerClient)))
     }
+  }
 }
