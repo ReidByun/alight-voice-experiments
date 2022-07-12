@@ -20,13 +20,19 @@ struct SystemEnvironment<Environment> {
   
   var mainQueue: () -> AnySchedulerOf<DispatchQueue>
   var audioPlayer: AudioEngineClient
+  var genScrubbingSourceNode: GenScrubbingSourceNode
+  
+  static func live(environment: Environment) -> Self {
+    //print("SystemEnvironment init live ttt")
+    return Self(environment: environment, mainQueue: { .main }, audioPlayer: .livePlayerClient, genScrubbingSourceNode: .live())
+  }
   
   static func live(environment: Environment, audioPlayer: AudioEngineClient) -> Self {
     //print("SystemEnvironment init live ttt")
-    return Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
+    return Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer, genScrubbingSourceNode: .live())
   }
   
   static func dev(environment: Environment, audioPlayer: AudioEngineClient) -> Self {
-    Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer)
+    Self(environment: environment, mainQueue: { .main }, audioPlayer: audioPlayer, genScrubbingSourceNode: .live())
   }
 }

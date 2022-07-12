@@ -204,10 +204,10 @@ private class AudioEngineClientWrapper: NSObject {
       to: engine.mainMixerNode,
       format: buffer.format)
     
-    //        engine.connect(
-    //            srcNode,
-    //            to: engine.mainMixerNode,
-    //            format: buffer.format)
+    engine.connect(
+      srcNode,
+      to: engine.mainMixerNode,
+      format: buffer.format)
     
     //writeAudioToFile()
     

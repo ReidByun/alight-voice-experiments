@@ -11,12 +11,15 @@ import AVFoundation
 class GenScrubbingSourceNode: Equatable {
   
   private var sourceNode: AVAudioSourceNode? = nil
-  private var audioFile: AVAudioFile
-  private var buffer: AVAudioPCMBuffer!
+  private var audioFile: AVAudioFile? = nil
+  private var buffer: AVAudioPCMBuffer? = nil
   private var acc = 0
   var isScrubbing = true
   
-  init(file: AVAudioFile, pcmBuffer: AVAudioPCMBuffer) {
+  init() {}
+  
+  convenience init(file: AVAudioFile, pcmBuffer: AVAudioPCMBuffer) {
+    self.init()
     audioFile = file
     buffer = pcmBuffer
   }
@@ -34,10 +37,10 @@ class GenScrubbingSourceNode: Equatable {
   func processScrubbing(ablPointer: UnsafeMutableAudioBufferListPointer, frameCount: Int) {
     for frame in 0..<Int(frameCount) {
       var channel = 0
-      for buffer in ablPointer {
-        let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(buffer)
-        if self.isScrubbing {
-          buf[frame] = self.buffer.floatChannelData?[channel][frame + self.acc] ?? 0
+      for bufferBlock in ablPointer {
+        let buf: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(bufferBlock)
+        if let buffer = self.buffer, self.isScrubbing {
+          buf[frame] = buffer.floatChannelData?[channel][frame + self.acc] ?? 0
         }
         else {
           buf[frame] = 0
@@ -51,5 +54,11 @@ class GenScrubbingSourceNode: Equatable {
   
   static func == (lhs: GenScrubbingSourceNode, rhs: GenScrubbingSourceNode) -> Bool {
     return lhs.audioFile == rhs.audioFile
+  }
+}
+
+extension GenScrubbingSourceNode {
+  static func live() -> GenScrubbingSourceNode {
+    return .init()
   }
 }

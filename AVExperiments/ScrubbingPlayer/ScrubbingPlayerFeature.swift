@@ -31,6 +31,7 @@ enum ScrubbingPlayerAction: Equatable {
 
 struct ScrubbingPlayerEnvironment {
   var audioPlayer: AudioEngineClient
+  var scrubbingSourceNode: GenScrubbingSourceNode
   var calcSeekFrameRelative: (Double, AVAudioFramePosition, AVAudioFramePosition, Double)-> AVAudioFramePosition
   var calcSeekFrameAbsolute: (Double, AVAudioFramePosition, Double)-> AVAudioFramePosition
 }
