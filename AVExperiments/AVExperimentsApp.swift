@@ -16,7 +16,7 @@ struct AVExperimentsApp: App {
         store: Store(
           initialState: RootState(),
           reducer: rootReducer,
-          environment: .live(environment: RootEnvironment())))
+          environment: .live()))
     }
   }
 }

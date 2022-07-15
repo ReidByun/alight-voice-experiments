@@ -40,12 +40,25 @@ struct ScrubbingPlayerEnvironment {
   var scrubbingSourceNode: GenScrubbingSourceNode
   var calcSeekFrameRelative: (Double, AVAudioFramePosition, AVAudioFramePosition, Double)-> AVAudioFramePosition
   var calcSeekFrameAbsolute: (Double, AVAudioFramePosition, Double)-> AVAudioFramePosition
+  var mainScheduler: AnySchedulerOf<DispatchQueue>
+}
+
+extension ScrubbingPlayerEnvironment {
+  static func live(scheduler: AnySchedulerOf<DispatchQueue>)-> Self {
+    .init(
+      audioPlayer: .livePlayerClient,
+      scrubbingSourceNode: .live(),
+      calcSeekFrameRelative: calcSeekFramePosition(fromTimeOffset:currentPos:audioSamples:sampleRate:),
+      calcSeekFrameAbsolute: calcSeekFramePosition(fromAbsTime:audioSamples:sampleRate:),
+      mainScheduler: scheduler
+    )
+  }
 }
 
 let scrubbingPlayerReducer = Reducer<
   ScrubbingPlayerState,
   ScrubbingPlayerAction,
-  SystemEnvironment<ScrubbingPlayerEnvironment>
+  ScrubbingPlayerEnvironment
 > { state, action, environment in
   enum TimerId {}
   
@@ -57,7 +70,7 @@ let scrubbingPlayerReducer = Reducer<
         return .none
       }
       return environment.audioPlayer.openUrl(fileURL)
-        .receive(on: environment.mainQueue())
+        .receive(on: environment.mainScheduler)
         .catchToEffect()
         .map(ScrubbingPlayerAction.audioLoaded)
       
@@ -77,7 +90,7 @@ let scrubbingPlayerReducer = Reducer<
         state.playerInfo.isPlaying = true
         return environment.audioPlayer
           .play(state.playerInfo)
-          .receive(on: environment.mainQueue())
+          .receive(on: environment.mainScheduler)
           .catchToEffect(ScrubbingPlayerAction.playingAudio)
       }
       
@@ -143,7 +156,7 @@ let scrubbingPlayerReducer = Reducer<
         return Effect.timer(
           id: TimerId.self,
           every: 0.02,
-          on: environment.mainQueue())
+          on: environment.mainScheduler)
         .map { _ in .updateDisplay }
       }
       else {
@@ -171,7 +184,7 @@ let scrubbingPlayerReducer = Reducer<
       print("seek-> \(state.playerInfo.seekFrame)")
       
       return environment.audioPlayer.seek(state.playerInfo.seekFrame, state.playerInfo)
-        .receive(on: environment.mainQueue())
+        .receive(on: environment.mainScheduler)
         .catchToEffect(ScrubbingPlayerAction.seekDone)
       
     case .seekDone(let result):

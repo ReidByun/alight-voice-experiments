@@ -27,7 +27,7 @@ struct RootView_Previews: PreviewProvider {
       store: Store(
         initialState: RootState(),
         reducer: rootReducer,
-        environment: .dev(environment: RootEnvironment(), audioPlayer: .livePlayerClient)))
+        environment: .dev()))
     return rootView
   }
 }

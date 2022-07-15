@@ -23,7 +23,7 @@ struct SystemEnvironment<Environment> {
   var genScrubbingSourceNode: GenScrubbingSourceNode
   
   static func live(environment: Environment) -> Self {
-    //print("SystemEnvironment init live ttt")
+    //print("SystemEnvironment init live without player ttt")
     return Self(environment: environment, mainQueue: { .main }, audioPlayer: .livePlayerClient, genScrubbingSourceNode: .live())
   }
   

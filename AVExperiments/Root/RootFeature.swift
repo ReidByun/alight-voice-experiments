@@ -16,26 +16,46 @@ enum RootAction {
 }
 
 struct RootEnvironment {
-  //var scrubbingPlayerEnvironment:
+  var mainQueue: () -> AnySchedulerOf<DispatchQueue>
+  var scrubbingPlayerEnvironment: ScrubbingPlayerEnvironment
+}
+
+//extension RootEnvironment {
+//  init(
+//    scrubbingPlayerEnvironment: ScrubbingPlayerEnvironment
+//  ) {
+//    self.scrubbingPlayerEnvironment = scrubbingPlayerEnvironment
+//  }
+//}
+
+extension RootEnvironment {
+  static func live() -> Self {
+    let scheduler: AnySchedulerOf<DispatchQueue> = .main
+    return .init(
+      mainQueue: { scheduler },
+      scrubbingPlayerEnvironment: .live(scheduler: scheduler)
+    )
+  }
+  
+  static func dev() -> Self {
+    let scheduler: AnySchedulerOf<DispatchQueue> = .main
+    return .init(
+      mainQueue: { scheduler },
+      scrubbingPlayerEnvironment: .live(scheduler: scheduler)
+    )
+  }
 }
 
 // swiftlint:disable trailing_closure
 let rootReducer = Reducer<
   RootState,
   RootAction,
-  SystemEnvironment<RootEnvironment>
+  RootEnvironment
 >.combine(
   scrubbingPlayerReducer.pullback (
     state: \.scrubbingPlayerState,
     action: /RootAction.scrubbingPlayerAction, // Case path
-    environment: {
-      .live(
-        environment: ScrubbingPlayerEnvironment(
-          audioPlayer: $0.audioPlayer,
-          scrubbingSourceNode: $0.genScrubbingSourceNode,
-          calcSeekFrameRelative: calcSeekFramePosition(fromTimeOffset:currentPos:audioSamples:sampleRate:),
-          calcSeekFrameAbsolute: calcSeekFramePosition(fromAbsTime:audioSamples:sampleRate:)))
-    })
+    environment: \.scrubbingPlayerEnvironment)
   //{ e in .live(environment: ScrubbingPlayerEnvironment(audioPlayer: e.audioPlayer), audioPlayer: e.audioPlayer) })
 )
 // swiftlint:enable trailing_closure
