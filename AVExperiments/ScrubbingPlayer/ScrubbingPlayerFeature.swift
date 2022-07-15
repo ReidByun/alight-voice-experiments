@@ -14,6 +14,12 @@ import AVFoundation
 struct ScrubbingPlayerState: Equatable {
   var playerInfo: ScrubbingPlayerModel = ScrubbingPlayerModel()
   var isTimearActive = false
+  
+  var isScrubbingNow = false;
+  var scrubbingFrame = 0;
+  var currentPlayingFrame = 0;
+  var scrubbingVelocity = 0.0;
+  
 }
 
 enum ScrubbingPlayerAction: Equatable {
@@ -70,7 +76,7 @@ let scrubbingPlayerReducer = Reducer<
       else {
         state.playerInfo.isPlaying = true
         return environment.audioPlayer
-          .play()
+          .play(state.playerInfo)
           .receive(on: environment.mainQueue())
           .catchToEffect(ScrubbingPlayerAction.playingAudio)
       }
@@ -164,7 +170,7 @@ let scrubbingPlayerReducer = Reducer<
       state.playerInfo.currentPosition = state.playerInfo.seekFrame
       print("seek-> \(state.playerInfo.seekFrame)")
       
-      return environment.audioPlayer.seek(state.playerInfo.seekFrame)
+      return environment.audioPlayer.seek(state.playerInfo.seekFrame, state.playerInfo)
         .receive(on: environment.mainQueue())
         .catchToEffect(ScrubbingPlayerAction.seekDone)
       

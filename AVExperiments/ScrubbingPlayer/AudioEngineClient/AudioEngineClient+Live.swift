@@ -33,11 +33,10 @@ extension AudioEngineClient {
             delegate?.pause()
             delegate = nil
             do {
-              delegate = try AudioEngineClientWrapper(
-                url: url
-              )
+              let file = try AVAudioFile(forReading: url)
+              delegate = try AudioEngineClientWrapper(avAudioFile: file)
               
-              guard let audioInfo = delegate?.audioInfo else {
+              guard let audioInfo = delegate?.setupAudioEngineClient() else {
                 callback(.failure(.failedToOpenFile))
                 return
               }
@@ -48,7 +47,7 @@ extension AudioEngineClient {
             }
           }
       },
-      play: {
+      play: { audioInfo in
         .future { callback in
           guard let playerDelegate = delegate else {
             callback(.failure(.couldntCreateAudioPlayer))
@@ -67,7 +66,7 @@ extension AudioEngineClient {
           }
           //}
           
-          playerDelegate.play()
+          playerDelegate.play(audioInfo: audioInfo)
         }
       },
       pause: {
@@ -100,14 +99,14 @@ extension AudioEngineClient {
         
         return delegate.currentFrame
       },
-      seek: { seekFrame in
+      seek: { seekFrame, audioInfo in
           .future { callback in
             guard let playerDelegate = delegate else {
               callback(.failure(.couldntCreateAudioPlayer))
               return
             }
             
-            playerDelegate.seek(to: seekFrame) { success in
+            playerDelegate.seek(to: seekFrame, audioInfo: audioInfo) { success in
               if success {
                 callback(.success(true))
               }
@@ -129,9 +128,10 @@ private class AudioEngineClientWrapper: NSObject {
   
   let engine: AVAudioEngine
   let player: AVAudioPlayerNode
-  private(set) var audioInfo: ScrubbingPlayerModel
+  //private(set) var audioInfo: ScrubbingPlayerModel
   private(set) var needsFileScheduled = true
-  private(set) var url: URL?
+  //private(set) var url: URL?
+  private(set) var avAudioFile: AVAudioFile
   
   private var isSeekingNow = false
   
@@ -147,24 +147,27 @@ private class AudioEngineClientWrapper: NSObject {
   }
   
   init(
-    url: URL
+    avAudioFile: AVAudioFile
   ) throws {
-    self.url = url
+    //self.url = url
+    self.avAudioFile = avAudioFile
     self.engine = AVAudioEngine()
-    self.audioInfo = ScrubbingPlayerModel()
+    //self.audioInfo = ScrubbingPlayerModel()
     self.player = AVAudioPlayerNode()
     super.init()
     
-    setupAudioWithBuffer()
+    //setupAudioEngineClient()
   }
   
-  private func setupAudioWithBuffer() {
-    guard let fileURL = self.url else {
-      return
-    }
+  func setupAudioEngineClient()-> ScrubbingPlayerModel? {
+//    guard let fileURL = self.url else {
+//      return
+//    }
     
     do {
-      let file = try AVAudioFile(forReading: fileURL)
+      var audioInfo = ScrubbingPlayerModel()
+      //let file = try AVAudioFile(forReading: fileURL)
+      let file = self.avAudioFile
       audioInfo.buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length))
       try file.read(into: audioInfo.buffer)
       let format = file.processingFormat
@@ -181,33 +184,40 @@ private class AudioEngineClientWrapper: NSObject {
       //FxScrubbingAudioUnit.getBufferList(from: buffer)
       
       configureEngineWithBuffer(with: audioInfo.buffer)
+      
+      return audioInfo
+      
     } catch {
       print("Error reading the audio file: \(error.localizedDescription)")
     }
+    
+    return nil
   }
   
   private func configureEngineWithBuffer(with buffer: AVAudioPCMBuffer) {
     engine.attach(player)
     //engine.attach(self.myAUNode!)
-    guard let file = audioInfo.audioFile else {
-      return
-    }
-    audioInfo.scrubbingSourceNode = GenScrubbingSourceNode(file: file, pcmBuffer: audioInfo.buffer)
-    guard let srcNode = audioInfo.scrubbingSourceNode.getSourceNode() else {
-      return
-    }
+//    guard let file = audioInfo.audioFile else {
+//      return
+//    }
     
-    engine.attach(srcNode)
+//    audioInfo.scrubbingSourceNode = GenScrubbingSourceNode(file: file, pcmBuffer: audioInfo.buffer)
+//    guard let srcNode = audioInfo.scrubbingSourceNode.getSourceNode() else {
+//      return
+//    }
+    let file = self.avAudioFile
+    
+    //engine.attach(srcNode)
     
     engine.connect(
       player,
       to: engine.mainMixerNode,
       format: buffer.format)
     
-    engine.connect(
-      srcNode,
-      to: engine.mainMixerNode,
-      format: buffer.format)
+//    engine.connect(
+//      srcNode,
+//      to: engine.mainMixerNode,
+//      format: buffer.format)
     
     //writeAudioToFile()
     
@@ -216,21 +226,21 @@ private class AudioEngineClientWrapper: NSObject {
     do {
       try engine.start()
       
-      scheduleAudioBuffer()
-      audioInfo.isPlayerReady = true
+      scheduleAudioBuffer(with: buffer)
+      //audioInfo.isPlayerReady = true
     } catch {
       print("Error starting the player: \(error.localizedDescription)")
     }
   }
   
-  private func scheduleAudioBuffer() {
+  private func scheduleAudioBuffer(with buffer: AVAudioPCMBuffer) {
     guard needsFileScheduled else {
       return
     }
     
     needsFileScheduled = false
     
-    player.scheduleBuffer(audioInfo.buffer, at: nil, options: [.interruptsAtLoop]) {
+    player.scheduleBuffer(buffer, at: nil, options: [.interruptsAtLoop]) {
       //player.scheduleBuffer(self.buffer) {
       print("play done.!!!")
       
@@ -241,13 +251,13 @@ private class AudioEngineClientWrapper: NSObject {
     }
   }
   
-  func play() {
+  func play(audioInfo: ScrubbingPlayerModel) {
     if player.isPlaying == true {
       player.pause()
     }
     
     if needsFileScheduled {
-      scheduleAudioBuffer()
+      scheduleAudioBuffer(with: audioInfo.buffer)
     }
     player.play()
   }
@@ -260,11 +270,12 @@ private class AudioEngineClientWrapper: NSObject {
     player.stop()
   }
   
-  func seek(to seekFramePosition: AVAudioFramePosition, completion: @escaping (Bool)->Void ) {
-    guard let audioFile = audioInfo.audioFile else {
-      completion(false)
-      return
-    }
+  func seek(to seekFramePosition: AVAudioFramePosition, audioInfo: ScrubbingPlayerModel, completion: @escaping (Bool)->Void ) {
+//    guard let audioFile = audioInfo.audioFile else {
+//      completion(false)
+//      return
+//    }
+    let audioFile = self.avAudioFile
     
     if seekFramePosition < audioInfo.audioLengthSamples {
       isSeekingNow = true

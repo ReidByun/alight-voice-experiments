@@ -12,13 +12,13 @@ import AVFoundation
 struct AudioEngineClient {
   var setSession: ()->()
   var openUrl: (URL) -> Effect<ScrubbingPlayerModel, APIError>
-  var play: () -> Effect<Action, Failure>
+  var play: (ScrubbingPlayerModel) -> Effect<Action, Failure>
   //    var play: () -> Effect<Never, Never>
   var pause: () -> Effect<Never, Never>
   var stop: () -> Effect<Never, Never>
   var currentFrame: () -> Effect<AVAudioFramePosition, Never>
   var playbackPosition: () -> AVAudioFramePosition
-  var seek: (AVAudioFramePosition)-> Effect<Bool, Failure>
+  var seek: (AVAudioFramePosition, ScrubbingPlayerModel)-> Effect<Bool, Failure>
   
   enum Action: Equatable {
     case didFinishPlaying(successfully: Bool)
