@@ -24,11 +24,13 @@ class GenScrubbingSourceNode: Equatable {
     buffer = pcmBuffer
   }
   
-  func getSourceNode()-> AVAudioSourceNode? {
-    sourceNode = AVAudioSourceNode { _, _, frameCount, audioBufferList -> OSStatus in
-      let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
-      self.processScrubbing(ablPointer: ablPointer, frameCount: Int(frameCount))
-      return noErr
+  func getSourceNode(renew: Bool = false)-> AVAudioSourceNode? {
+    if sourceNode == nil || renew {
+      sourceNode = AVAudioSourceNode { _, _, frameCount, audioBufferList -> OSStatus in
+        let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+        self.processScrubbing(ablPointer: ablPointer, frameCount: Int(frameCount))
+        return noErr
+      }
     }
     
     return sourceNode
@@ -50,6 +52,11 @@ class GenScrubbingSourceNode: Equatable {
       }
     }
     acc = acc + frameCount
+  }
+  
+  func updateSource(file: AVAudioFile, pcmBuffer: AVAudioPCMBuffer) {
+    audioFile = file
+    buffer = pcmBuffer
   }
   
   static func == (lhs: GenScrubbingSourceNode, rhs: GenScrubbingSourceNode) -> Bool {

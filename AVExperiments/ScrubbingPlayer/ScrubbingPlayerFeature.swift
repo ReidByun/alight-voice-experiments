@@ -98,6 +98,14 @@ let scrubbingPlayerReducer = Reducer<
       switch result {
         case .success(let info):
           state.playerInfo = info
+          if let file = state.playerInfo.audioFile {
+            environment.scrubbingSourceNode.updateSource(file: file, pcmBuffer: state.playerInfo.buffer)
+            guard let srcNode = environment.scrubbingSourceNode.getSourceNode() else {
+              break
+            }
+            
+            _ = environment.audioPlayer.connectSrcNodeToMixer(state.playerInfo, srcNode)
+          }
         case .failure(let error):
           break
       }

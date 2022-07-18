@@ -19,6 +19,7 @@ struct AudioEngineClient {
   var currentFrame: () -> Effect<AVAudioFramePosition, Never>
   var playbackPosition: () -> AVAudioFramePosition
   var seek: (AVAudioFramePosition, ScrubbingPlayerModel)-> Effect<Bool, Failure>
+  var connectSrcNodeToMixer: (ScrubbingPlayerModel, AVAudioSourceNode)-> Bool
   
   enum Action: Equatable {
     case didFinishPlaying(successfully: Bool)

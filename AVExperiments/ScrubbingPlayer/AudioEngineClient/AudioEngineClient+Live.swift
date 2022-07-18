@@ -116,6 +116,13 @@ extension AudioEngineClient {
               
             }
           }
+      },
+      connectSrcNodeToMixer: { audioInfo, srcNode in
+        guard let playerDelegate = delegate else {
+          return false
+        }
+        
+        return playerDelegate.connectNodeToMixer(audioInfo: audioInfo, srcNode: srcNode)
       }
       
     )
@@ -196,28 +203,10 @@ private class AudioEngineClientWrapper: NSObject {
   
   private func configureEngineWithBuffer(with buffer: AVAudioPCMBuffer) {
     engine.attach(player)
-    //engine.attach(self.myAUNode!)
-//    guard let file = audioInfo.audioFile else {
-//      return
-//    }
-    
-//    audioInfo.scrubbingSourceNode = GenScrubbingSourceNode(file: file, pcmBuffer: audioInfo.buffer)
-//    guard let srcNode = audioInfo.scrubbingSourceNode.getSourceNode() else {
-//      return
-//    }
-    let file = self.avAudioFile
-    
-    //engine.attach(srcNode)
-    
     engine.connect(
       player,
       to: engine.mainMixerNode,
       format: buffer.format)
-    
-//    engine.connect(
-//      srcNode,
-//      to: engine.mainMixerNode,
-//      format: buffer.format)
     
     //writeAudioToFile()
     
@@ -255,7 +244,7 @@ private class AudioEngineClientWrapper: NSObject {
     if player.isPlaying == true {
       player.pause()
     }
-    
+
     if needsFileScheduled {
       scheduleAudioBuffer(with: audioInfo.buffer)
     }
@@ -320,6 +309,25 @@ private class AudioEngineClientWrapper: NSObject {
   
   func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
     self.decodeErrorDidOccur?(error)
+  }
+  
+  func connectNodeToMixer(audioInfo: ScrubbingPlayerModel, srcNode: AVAudioSourceNode)-> Bool {
+//    guard let file = audioInfo.audioFile else {
+//      return
+//    }
+//
+//    let scrubbingSourceNode = GenScrubbingSourceNode(file: file, pcmBuffer: audioInfo.buffer)
+//    guard let srcNode = scrubbingSourceNode.getSourceNode() else {
+//      return
+//    }
+//
+    engine.attach(srcNode)
+    engine.connect(
+      srcNode,
+      to: engine.mainMixerNode,
+      format: audioInfo.buffer.format)
+    
+    return true
   }
 }
 
