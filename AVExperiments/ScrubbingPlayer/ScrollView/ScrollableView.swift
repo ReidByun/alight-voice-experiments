@@ -51,7 +51,10 @@ struct ScrollableView<Content: View>: UIViewControllerRepresentable, Equatable {
       let velocity = (elapsed == 0) ? 0 : abs(distance / CGFloat(elapsed))
       self.previousScrollMoment = d
       self.previousScrollX = x
-      //nowScrollVelocity = velocity
+      DispatchQueue.main.async {
+        self.scrollVelocity.wrappedValue = velocity
+      }
+      //velocity
       //print("vel \(velocity)")
       
     }

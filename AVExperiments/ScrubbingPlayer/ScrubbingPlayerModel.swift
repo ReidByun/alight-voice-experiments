@@ -29,7 +29,7 @@ struct ScrubbingPlayerModel: Equatable {
   var playerProgress: Double = 0
   var prevProgress: Double = -1
   
-  var currentPosition: AVAudioFramePosition = 0
+  var currentFramePosition: AVAudioFramePosition = 0
   var seekFrame: AVAudioFramePosition = 0
   
   var playbackMode = PlaybackMode.notPlaying

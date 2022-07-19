@@ -41,7 +41,7 @@ struct ScrubbingPlayerView: View {
         //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
         //                .padding(.bottom, 8)
         //                .frame(height: 40)
-        PlaybackScrollView(store: self.store, progress: viewStore.playerInfo.playerProgress)
+        PlaybackScrollView(store: self.store)
           .padding(.bottom)
         
         
@@ -138,8 +138,8 @@ struct PlaybackScrollView: View {
   @State private var contentOffset: CGPoint = .zero
   @State private var screenSize: CGRect = UIScreen.main.bounds
   @State private var orientation = UIDeviceOrientation.unknown
+  
   @State var scrollVelocity: CGFloat = CGFloat(0)
-  var progress: Double
   
   @State var nowScrubbing: Bool = false
   
@@ -180,7 +180,7 @@ struct PlaybackScrollView: View {
         orientation = newOrientation
         screenSize = UIScreen.main.bounds
       }
-      .onChange(of: progress) { currentProgress in
+      .onChange(of: viewStore.playerInfo.playerProgress) { currentProgress in
         if !nowScrubbing {
           //print("currentView Progress - \(currentProgress)")
           self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
@@ -189,6 +189,8 @@ struct PlaybackScrollView: View {
       }
       .onChange(of: nowScrubbing) { [nowScrubbing] newStateScrubbing in
         print("scrubbing: \(newStateScrubbing) \(nowScrubbing)")
+        viewStore.send(.setScrubbing(on: newStateScrubbing))
+        
         let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
         if nowScrubbing {
           self.contentOffset = CGPoint(x: progressToOffset(progress: progress, width: screenSize.width), y: 0)
@@ -198,6 +200,13 @@ struct PlaybackScrollView: View {
           let seekTime = progressToTime(progress: progress, totalTime: viewStore.playerInfo.audioLengthSeconds)
           print("seek time \(seekTime)")
           viewStore.send(.seek(time: seekTime, relative: false))
+        }
+      }
+      .onChange(of: contentOffset) { offset in
+        if nowScrubbing {
+          let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
+          let frame = progressToFrame(progress: progress, totalFrame: Int(viewStore.playerInfo.audioLengthSamples))
+          viewStore.send(.setScrubbingProperties(frame: frame, velocity: scrollVelocity))
         }
       }
     }
@@ -213,6 +222,10 @@ struct PlaybackScrollView: View {
   
   func progressToTime(progress: Double, totalTime: Double)-> Double {
     return progress / 100.0 * totalTime
+  }
+  
+  func progressToFrame(progress: Double, totalFrame: Int)-> Int {
+    return Int(progress * Double(totalFrame) / 100.0)
   }
 }
 

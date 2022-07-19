@@ -17,8 +17,8 @@ struct ScrubbingPlayerState: Equatable {
   
   var isScrubbingNow = false;
   var scrubbingFrame = 0;
-  var currentPlayingFrame = 0;
-  var scrubbingVelocity = 0.0;
+  //var currentPlayingFrame = 0;
+  var scrubbingVelocity: Double = 0.0
   
 }
 
@@ -33,6 +33,8 @@ enum ScrubbingPlayerAction: Equatable {
   case updateDisplay
   case seek(time: Double, relative: Bool)
   case seekDone(Result<Bool, AudioEngineClient.Failure>)
+  case setScrubbing(on: Bool)
+  case setScrubbingProperties(frame: Int, velocity: Double)
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -121,13 +123,13 @@ let scrubbingPlayerReducer = Reducer<
         let currentPosition = environment.audioPlayer.playbackPosition() + state.playerInfo.seekFrame
         
         if !(0...state.playerInfo.audioLengthSamples ~= currentPosition) {
-          state.playerInfo.currentPosition = max(currentPosition, 0)
-          state.playerInfo.currentPosition = min(currentPosition, state.playerInfo.audioLengthSamples)
+          state.playerInfo.currentFramePosition = max(currentPosition, 0)
+          state.playerInfo.currentFramePosition = min(currentPosition, state.playerInfo.audioLengthSamples)
           
-          if state.playerInfo.currentPosition >= state.playerInfo.audioLengthSamples {
+          if state.playerInfo.currentFramePosition >= state.playerInfo.audioLengthSamples {
             
             state.playerInfo.seekFrame = 0
-            state.playerInfo.currentPosition = 0
+            state.playerInfo.currentFramePosition = 0
             
             state.playerInfo.isPlaying = false
             return environment.audioPlayer.stop().fireAndForget()
@@ -138,8 +140,8 @@ let scrubbingPlayerReducer = Reducer<
           
         }
         else {
-          state.playerInfo.currentPosition = currentPosition
-          let progress = Double(state.playerInfo.currentPosition) / Double(state.playerInfo.audioLengthSamples) * 100.0
+          state.playerInfo.currentFramePosition = currentPosition
+          let progress = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioLengthSamples) * 100.0
           
           //print("player frame \(frame)")
           if state.playerInfo.playerProgress != progress {
@@ -148,7 +150,7 @@ let scrubbingPlayerReducer = Reducer<
             state.playerInfo.playerProgress = progress
           }
           
-          let time = Double(state.playerInfo.currentPosition) / Double(state.playerInfo.audioSampleRate)
+          let time = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioSampleRate)
           state.playerInfo.playerTime = PlayerTime(
             elapsedTime: time,
             remainingTime: state.playerInfo.audioLengthSeconds - time)
@@ -177,7 +179,7 @@ let scrubbingPlayerReducer = Reducer<
         let currentFrame = environment.audioPlayer.playbackPosition()
         state.playerInfo.seekFrame = environment.calcSeekFrameRelative(
           time,
-          state.playerInfo.currentPosition,
+          state.playerInfo.currentFramePosition,
           state.playerInfo.audioLengthSamples,
           state.playerInfo.audioSampleRate)
       }
@@ -188,7 +190,7 @@ let scrubbingPlayerReducer = Reducer<
           state.playerInfo.audioSampleRate)
       }
       
-      state.playerInfo.currentPosition = state.playerInfo.seekFrame
+      state.playerInfo.currentFramePosition = state.playerInfo.seekFrame
       print("seek-> \(state.playerInfo.seekFrame)")
       
       return environment.audioPlayer.seek(state.playerInfo.seekFrame, state.playerInfo)
@@ -202,6 +204,16 @@ let scrubbingPlayerReducer = Reducer<
         case .success(false), .failure:
           print("seek failed")
       }
+      return .none
+      
+    case .setScrubbing(on: let on):
+      state.isScrubbingNow = on
+      return .none
+      
+    case .setScrubbingProperties(frame: let frame, velocity: let velocity):
+      state.scrubbingFrame = frame
+      state.scrubbingVelocity = velocity
+      //print("\(frame) - \(velocity)")
       return .none
   }
 }
