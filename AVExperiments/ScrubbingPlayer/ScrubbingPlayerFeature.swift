@@ -67,8 +67,8 @@ let scrubbingPlayerReducer = Reducer<
   switch action {
     case .onAppear:
       environment.audioPlayer.setSession()
-      //        guard let fileURL = Bundle.main.url(forResource: "IU-5s", withExtension: "mp3") else {
-      guard let fileURL = Bundle.main.url(forResource: "roses", withExtension: "mp3") else {
+        guard let fileURL = Bundle.main.url(forResource: "IU-5s", withExtension: "mp3") else {
+//      guard let fileURL = Bundle.main.url(forResource: "roses", withExtension: "mp3") else {
         return .none
       }
       return environment.audioPlayer.openUrl(fileURL)
@@ -156,6 +156,8 @@ let scrubbingPlayerReducer = Reducer<
             remainingTime: state.playerInfo.audioLengthSeconds - time)
         }
         
+        environment.scrubbingSourceNode.setCurrentPlayingFrame(frame: state.playerInfo.currentFramePosition)
+        
       }
       
       return .none
@@ -208,11 +210,16 @@ let scrubbingPlayerReducer = Reducer<
       
     case .setScrubbing(on: let on):
       state.isScrubbingNow = on
+      environment.scrubbingSourceNode.setIsScrubbing(on: state.isScrubbingNow)
       return .none
       
     case .setScrubbingProperties(frame: let frame, velocity: let velocity):
-      state.scrubbingFrame = frame
-      state.scrubbingVelocity = velocity
+      if frame != state.scrubbingFrame {
+        state.scrubbingFrame = frame
+        state.scrubbingVelocity = velocity
+        
+        environment.scrubbingSourceNode.setScrubbingInfo(frame: AVAudioFramePosition(state.scrubbingFrame), velocity: state.scrubbingVelocity)
+      }
       //print("\(frame) - \(velocity)")
       return .none
   }

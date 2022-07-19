@@ -191,6 +191,10 @@ struct PlaybackScrollView: View {
         print("scrubbing: \(newStateScrubbing) \(nowScrubbing)")
         viewStore.send(.setScrubbing(on: newStateScrubbing))
         
+        if newStateScrubbing && viewStore.playerInfo.isPlaying {
+          viewStore.send(.playPauseTapped(viewStore.playerInfo))
+        }
+        
         let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
         if nowScrubbing {
           self.contentOffset = CGPoint(x: progressToOffset(progress: progress, width: screenSize.width), y: 0)
