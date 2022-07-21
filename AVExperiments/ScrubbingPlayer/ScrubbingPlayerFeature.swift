@@ -20,6 +20,10 @@ struct ScrubbingPlayerState: Equatable {
   //var currentPlayingFrame = 0;
   var scrubbingVelocity: Double = 0.0
   
+  // relates to view
+  var progressViewOffset: CGPoint = .zero
+  var progressViewWidth: Double = 0
+  
 }
 
 enum ScrubbingPlayerAction: Equatable {
@@ -35,6 +39,11 @@ enum ScrubbingPlayerAction: Equatable {
   case seekDone(Result<Bool, AudioEngineClient.Failure>)
   case setScrubbing(on: Bool)
   case setScrubbingProperties(frame: Int, velocity: Double)
+  case setScrubbingPropertiesWithView(offset: Double, velocity: Double)
+  
+  // relates to View
+  case setProgressViewOffset(offset: CGPoint)
+  case setProgressViewWidth(width: Double)
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -43,6 +52,10 @@ struct ScrubbingPlayerEnvironment {
   var calcSeekFrameRelative: (Double, AVAudioFramePosition, AVAudioFramePosition, Double)-> AVAudioFramePosition
   var calcSeekFrameAbsolute: (Double, AVAudioFramePosition, Double)-> AVAudioFramePosition
   var mainScheduler: AnySchedulerOf<DispatchQueue>
+  var progressToOffset: (Double, Double)-> Double = { progress, width in progress / 100.0 * width }
+  var offsetToProgress: (Double, Double)-> Double = { offset, width in return offset / width * 100.0 }
+  var progressToTime: (Double, Double)-> Double = { progress, totalTime in return progress / 100.0 * totalTime }
+  var progressToFrame: (Double, Int)-> Int = { progress, totalFrame in return Int(progress * Double(totalFrame) / 100.0) }
 }
 
 extension ScrubbingPlayerEnvironment {
@@ -157,7 +170,7 @@ let scrubbingPlayerReducer = Reducer<
         }
         
         environment.scrubbingSourceNode.setCurrentPlayingFrame(frame: state.playerInfo.currentFramePosition)
-        
+        state.progressViewOffset = CGPoint(x: environment.progressToOffset(state.playerInfo.playerProgress, state.progressViewWidth), y: 0)
       }
       
       return .none
@@ -209,18 +222,44 @@ let scrubbingPlayerReducer = Reducer<
       return .none
       
     case .setScrubbing(on: let on):
+      let doSeek = state.isScrubbingNow && !on
       state.isScrubbingNow = on
       environment.scrubbingSourceNode.setIsScrubbing(on: state.isScrubbingNow)
-      return .none
+      
+      if doSeek {
+        let seekTime = environment.progressToTime(state.playerInfo.playerProgress, state.playerInfo.audioLengthSeconds)
+        return Effect(value: .seek(time: seekTime, relative: false))
+      }
+      else {
+        return .none
+      }
       
     case .setScrubbingProperties(frame: let frame, velocity: let velocity):
       if frame != state.scrubbingFrame {
         state.scrubbingFrame = frame
         state.scrubbingVelocity = velocity
-        
+
         environment.scrubbingSourceNode.setScrubbingInfo(frame: AVAudioFramePosition(state.scrubbingFrame), velocity: state.scrubbingVelocity)
       }
       //print("\(frame) - \(velocity)")
+      return .none
+      
+    case .setScrubbingPropertiesWithView(offset: let offset, velocity: let velocity):
+      if offset != state.progressViewOffset.x {
+        let progress = environment.offsetToProgress(offset, state.progressViewWidth)
+        state.playerInfo.playerProgress = progress
+        let frame = environment.progressToFrame(progress, Int(state.playerInfo.audioLengthSamples))
+        
+        return Effect(value: .setScrubbingProperties(frame: frame, velocity: velocity))
+      }
+      return .none
+      
+    case .setProgressViewOffset(let offset):
+      state.progressViewOffset = offset
+      return .none
+      
+    case .setProgressViewWidth(let width):
+      state.progressViewWidth = width
       return .none
   }
 }

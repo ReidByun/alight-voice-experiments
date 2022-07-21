@@ -10,9 +10,8 @@ import ComposableArchitecture
 
 struct ScrubbingPlayerView: View {
   let store: Store<ScrubbingPlayerState, ScrubbingPlayerAction>
-  @State var testOffset: CGPoint = .zero
   let timer = Timer.publish(every: 0.001, on: .main, in: .common).autoconnect()
-  @State var press = false
+  @State var isAutoScrollMode = false
   
   var body: some View {
     WithViewStore(self.store) { viewStore in
@@ -41,7 +40,7 @@ struct ScrubbingPlayerView: View {
   private var PlayerControlView: some View {
     WithViewStore(self.store) { viewStore in
       VStack {
-        PlaybackScrollView(store: self.store, testOffset: $testOffset)
+        PlaybackScrollView(store: self.store)
           .padding(.bottom)
         
         HStack {
@@ -63,18 +62,19 @@ struct ScrubbingPlayerView: View {
           text: "Auto Scroll",
           action: { press in
             viewStore.send(.setScrubbing(on: press))
-            self.press = press
+            self.isAutoScrollMode = press
           })
         .font(.system(size: 20))
         
       }
       .onReceive(timer) { _ in
-        if press {
-          if testOffset.x <= 390 {
-            testOffset.x = testOffset.x + 0.085
+        if isAutoScrollMode {
+          if viewStore.progressViewOffset.x <= 390 {
+            let offset = CGPoint(x: viewStore.progressViewOffset.x + 0.085, y: viewStore.progressViewOffset.y)
+            viewStore.send(.setProgressViewOffset(offset: offset))
           }
           else {
-            testOffset.x = 0
+            viewStore.send(.setProgressViewOffset(offset: .zero))
           }
         }
       }
@@ -157,15 +157,13 @@ struct PlaybackScrollView: View {
   @State private var screenSize: CGRect = UIScreen.main.bounds
   @State private var orientation = UIDeviceOrientation.unknown
   
-  @State var scrollVelocity: CGFloat = CGFloat(0)
-  
-  @State var nowScrubbing: Bool = false
-  @Binding var testOffset: CGPoint
+  @State private var scrollVelocity: CGFloat = CGFloat(0)
+  @State private var nowScrubbing: Bool = false
   
   var body: some View {
     WithViewStore(self.store) { viewStore in
       VStack {
-        Text("off: \(Int(contentOffset.x))")
+        Text("\(contentOffset.x / screenSize.width * 100.0) off: \(Int(contentOffset.x))")
         ZStack {
           ScrollableView(
             self.$contentOffset,
@@ -199,58 +197,28 @@ struct PlaybackScrollView: View {
         orientation = newOrientation
         screenSize = UIScreen.main.bounds
         print("screen: \(screenSize)")
-      }
-      .onChange(of: viewStore.playerInfo.playerProgress) { currentProgress in
-        if !nowScrubbing {
-          self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
-        }
+        viewStore.send(.setProgressViewWidth(width: screenSize.width))
       }
       .onChange(of: nowScrubbing) { newStateScrubbing in
         print("scrubbing: \(newStateScrubbing) \(viewStore.isScrubbingNow)")
-        viewStore.send(.setScrubbing(on: newStateScrubbing))
-        
+           
         if newStateScrubbing && viewStore.playerInfo.isPlaying {
           viewStore.send(.playPauseTapped(viewStore.playerInfo))
         }
         
-        let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
-        if viewStore.isScrubbingNow {
-          self.contentOffset = CGPoint(x: progressToOffset(progress: progress, width: screenSize.width), y: 0)
-        }
-        
-        if viewStore.isScrubbingNow != newStateScrubbing && !newStateScrubbing {
-          let seekTime = progressToTime(progress: progress, totalTime: viewStore.playerInfo.audioLengthSeconds)
-          print("seek time \(seekTime)")
-          viewStore.send(.seek(time: seekTime, relative: false))
+        viewStore.send(.setScrubbing(on: newStateScrubbing))
+      }
+      .onChange(of: viewStore.progressViewOffset) { offset in
+        if !nowScrubbing {
+          self.contentOffset = offset
         }
       }
       .onChange(of: contentOffset) { offset in
         if viewStore.isScrubbingNow {
-          let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
-          let frame = progressToFrame(progress: progress, totalFrame: Int(viewStore.playerInfo.audioLengthSamples))
-          viewStore.send(.setScrubbingProperties(frame: frame, velocity: scrollVelocity))
+          viewStore.send(.setScrubbingPropertiesWithView(offset: offset.x, velocity: scrollVelocity))
         }
       }
-      .onChange(of: testOffset) { offset in
-        self.contentOffset = offset
-      }
     }
-  }
-  
-  func progressToOffset(progress: Double, width: Double)-> Double {
-    return progress / 100.0 * width
-  }
-  
-  func offsetToProgress(offset: Double, width: Double)-> Double {
-    return offset / width * 100.0
-  }
-  
-  func progressToTime(progress: Double, totalTime: Double)-> Double {
-    return progress / 100.0 * totalTime
-  }
-  
-  func progressToFrame(progress: Double, totalFrame: Int)-> Int {
-    return Int(progress * Double(totalFrame) / 100.0)
   }
 }
 
