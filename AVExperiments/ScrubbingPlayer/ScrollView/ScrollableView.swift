@@ -98,7 +98,7 @@ struct ScrollableView<Content: View>: UIViewControllerRepresentable, Equatable {
   //    private (set) var scrollEnded: Binding<Bool>
   
   // MARK: - Init
-  init(_ offset: Binding<CGPoint>, animationDuration: TimeInterval, showsScrollIndicator: Bool = true, axis: Axis = .vertical, onScale: ((CGFloat)->Void)? = nil, disableScroll: Bool = false, forceRefresh: Bool = false, stopScrolling: Binding<Bool> = .constant(false), scrollVelocity: Binding<CGFloat> = .constant(100), beginDragging: (()->Void)? = nil, endDragging: ((_ will: Bool)->Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
+  init(_ offset: Binding<CGPoint>, animationDuration: TimeInterval, showsScrollIndicator: Bool = false, axis: Axis = .vertical, onScale: ((CGFloat)->Void)? = nil, disableScroll: Bool = false, forceRefresh: Bool = false, stopScrolling: Binding<Bool> = .constant(false), scrollVelocity: Binding<CGFloat> = .constant(100), beginDragging: (()->Void)? = nil, endDragging: ((_ will: Bool)->Void)? = nil, @ViewBuilder content: @escaping () -> Content) {
     self.offset               = offset
     self.onScale              = onScale
     self.animationDuration    = animationDuration

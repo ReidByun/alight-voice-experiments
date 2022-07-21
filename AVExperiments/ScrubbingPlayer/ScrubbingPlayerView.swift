@@ -10,6 +10,9 @@ import ComposableArchitecture
 
 struct ScrubbingPlayerView: View {
   let store: Store<ScrubbingPlayerState, ScrubbingPlayerAction>
+  @State var testOffset: CGPoint = .zero
+  let timer = Timer.publish(every: 0.001, on: .main, in: .common).autoconnect()
+  @State var press = false
   
   var body: some View {
     WithViewStore(self.store) { viewStore in
@@ -38,12 +41,8 @@ struct ScrubbingPlayerView: View {
   private var PlayerControlView: some View {
     WithViewStore(self.store) { viewStore in
       VStack {
-        //            SliderBarView(value: $viewModel.playerProgress, isEditing: $viewModel.isScrubbing)
-        //                .padding(.bottom, 8)
-        //                .frame(height: 40)
-        PlaybackScrollView(store: self.store)
+        PlaybackScrollView(store: self.store, testOffset: $testOffset)
           .padding(.bottom)
-        
         
         HStack {
           Text(viewStore.playerInfo.playerTime.elapsedText)
@@ -60,6 +59,24 @@ struct ScrubbingPlayerView: View {
         //.disabled(!viewModel.isPlayerReady)
           .padding(.bottom)
         
+        StateButtonView(
+          text: "Auto Scroll",
+          action: { press in
+            viewStore.send(.setScrubbing(on: press))
+            self.press = press
+          })
+        .font(.system(size: 20))
+        
+      }
+      .onReceive(timer) { _ in
+        if press {
+          if testOffset.x <= 390 {
+            testOffset.x = testOffset.x + 0.085
+          }
+          else {
+            testOffset.x = 0
+          }
+        }
       }
       //.padding(.horizontal)
     }
@@ -105,9 +122,10 @@ struct ScrubbingPlayerView: View {
       .foregroundColor(.primary)
       .padding(.vertical, 20)
       .frame(height: 58)
+      
+      Spacer()
     }
   }
-  //}
 }
 
 fileprivate struct SliderBarView: View {
@@ -142,6 +160,7 @@ struct PlaybackScrollView: View {
   @State var scrollVelocity: CGFloat = CGFloat(0)
   
   @State var nowScrubbing: Bool = false
+  @Binding var testOffset: CGPoint
   
   var body: some View {
     WithViewStore(self.store) { viewStore in
@@ -179,16 +198,15 @@ struct PlaybackScrollView: View {
       .onRotate { newOrientation in
         orientation = newOrientation
         screenSize = UIScreen.main.bounds
+        print("screen: \(screenSize)")
       }
       .onChange(of: viewStore.playerInfo.playerProgress) { currentProgress in
         if !nowScrubbing {
-          //print("currentView Progress - \(currentProgress)")
           self.contentOffset = CGPoint(x: progressToOffset(progress: currentProgress, width: screenSize.width), y: 0)
-          //print(progress)
         }
       }
-      .onChange(of: nowScrubbing) { [nowScrubbing] newStateScrubbing in
-        print("scrubbing: \(newStateScrubbing) \(nowScrubbing)")
+      .onChange(of: nowScrubbing) { newStateScrubbing in
+        print("scrubbing: \(newStateScrubbing) \(viewStore.isScrubbingNow)")
         viewStore.send(.setScrubbing(on: newStateScrubbing))
         
         if newStateScrubbing && viewStore.playerInfo.isPlaying {
@@ -196,22 +214,25 @@ struct PlaybackScrollView: View {
         }
         
         let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
-        if nowScrubbing {
+        if viewStore.isScrubbingNow {
           self.contentOffset = CGPoint(x: progressToOffset(progress: progress, width: screenSize.width), y: 0)
         }
         
-        if nowScrubbing != newStateScrubbing && !newStateScrubbing {
+        if viewStore.isScrubbingNow != newStateScrubbing && !newStateScrubbing {
           let seekTime = progressToTime(progress: progress, totalTime: viewStore.playerInfo.audioLengthSeconds)
           print("seek time \(seekTime)")
           viewStore.send(.seek(time: seekTime, relative: false))
         }
       }
       .onChange(of: contentOffset) { offset in
-        if nowScrubbing {
+        if viewStore.isScrubbingNow {
           let progress = offsetToProgress(offset: Double(contentOffset.x), width: screenSize.width)
           let frame = progressToFrame(progress: progress, totalFrame: Int(viewStore.playerInfo.audioLengthSamples))
           viewStore.send(.setScrubbingProperties(frame: frame, velocity: scrollVelocity))
         }
+      }
+      .onChange(of: testOffset) { offset in
+        self.contentOffset = offset
       }
     }
   }
@@ -230,6 +251,22 @@ struct PlaybackScrollView: View {
   
   func progressToFrame(progress: Double, totalFrame: Int)-> Int {
     return Int(progress * Double(totalFrame) / 100.0)
+  }
+}
+
+
+fileprivate struct StateButtonView: View {
+  @State var press = false
+  var text: String
+  var action: (Bool)-> Void
+  
+  var body: some View {
+    Button {
+      press = !press
+      action(press)
+    } label: {
+      Text(text)
+    }
   }
 }
 
