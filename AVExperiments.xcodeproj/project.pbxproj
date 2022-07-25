@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		30A2BB61288A982100720BD3 /* MusicAssetListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A2BB60288A982100720BD3 /* MusicAssetListFeature.swift */; };
+		30A2BB63288A983900720BD3 /* MusicAssetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A2BB62288A983800720BD3 /* MusicAssetListView.swift */; };
+		30A2BB65288ADDF700720BD3 /* MusicAssetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A2BB64288ADDF700720BD3 /* MusicAssetModel.swift */; };
 		30B848302874367B0073D693 /* ScrubbingPlayerCalculation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B8482F2874367B0073D693 /* ScrubbingPlayerCalculation.swift */; };
 		30B848322875843E0073D693 /* roses.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30B848312875843E0073D693 /* roses.mp3 */; };
 		30C43ACE2866A4EC00F1E88B /* ScrollableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */; };
@@ -56,6 +59,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		30A2BB60288A982100720BD3 /* MusicAssetListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAssetListFeature.swift; sourceTree = "<group>"; };
+		30A2BB62288A983800720BD3 /* MusicAssetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAssetListView.swift; sourceTree = "<group>"; };
+		30A2BB64288ADDF700720BD3 /* MusicAssetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAssetModel.swift; sourceTree = "<group>"; };
 		30B8482F2874367B0073D693 /* ScrubbingPlayerCalculation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubbingPlayerCalculation.swift; sourceTree = "<group>"; };
 		30B848312875843E0073D693 /* roses.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = roses.mp3; sourceTree = "<group>"; };
 		30C43ACD2866A4EC00F1E88B /* ScrollableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollableView.swift; sourceTree = "<group>"; };
@@ -115,6 +121,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		30A2BB5F288A97D600720BD3 /* MusicAssetList */ = {
+			isa = PBXGroup;
+			children = (
+				30A2BB60288A982100720BD3 /* MusicAssetListFeature.swift */,
+				30A2BB62288A983800720BD3 /* MusicAssetListView.swift */,
+				30A2BB64288ADDF700720BD3 /* MusicAssetModel.swift */,
+			);
+			path = MusicAssetList;
+			sourceTree = "<group>";
+		};
 		30C43ACC2866A4DA00F1E88B /* ScrollView */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,6 +176,7 @@
 				30F6B472284AFBF9007C3440 /* Root */,
 				30F6B473284AFC06007C3440 /* Share */,
 				30F6B474284AFC10007C3440 /* ScrubbingPlayer */,
+				30A2BB5F288A97D600720BD3 /* MusicAssetList */,
 				30F6B449284AF1E0007C3440 /* Assets.xcassets */,
 				30B848312875843E0073D693 /* roses.mp3 */,
 				30F6B484284B25B6007C3440 /* IU-5s.mp3 */,
@@ -390,12 +407,15 @@
 				30F6B48A284E45D5007C3440 /* RootFeature.swift in Sources */,
 				30F6B483284B256E007C3440 /* PlayerTime.swift in Sources */,
 				30F6B47C284AFD57007C3440 /* ScrubbingPlayerModel.swift in Sources */,
+				30A2BB65288ADDF700720BD3 /* MusicAssetModel.swift in Sources */,
 				30C43AD92869ADDC00F1E88B /* AudioInfo.swift in Sources */,
 				30C43AD72866CF4800F1E88B /* GenScrubbingSourceNode.swift in Sources */,
 				30F6B446284AF1DE007C3440 /* AVExperimentsApp.swift in Sources */,
 				30F6B482284B256E007C3440 /* Image+Extension.swift in Sources */,
+				30A2BB63288A983900720BD3 /* MusicAssetListView.swift in Sources */,
 				30C43ACE2866A4EC00F1E88B /* ScrollableView.swift in Sources */,
 				30F6B476284AFD04007C3440 /* ScrubbingPlayerView.swift in Sources */,
+				30A2BB61288A982100720BD3 /* MusicAssetListFeature.swift in Sources */,
 				30C43AD02866A55600F1E88B /* View+Extension.swift in Sources */,
 				30F6B47A284AFD48007C3440 /* ScrubbingPlayerEffects.swift in Sources */,
 				30C43AD32866CAD500F1E88B /* AudioEngineClient.swift in Sources */,
