@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import ComposableArchitecture
+import AVFoundation
 
 struct MusicAssetListState: Equatable {
   var musicAssets: [MusicAssetModel] = []
@@ -35,10 +36,25 @@ let musicAssetListReducer = Reducer<
   MusicAssetListEnvironment> { state, action, environment in
     switch action {
       case .load:
-        // using loader from environment.
-        state.musicAssets.append(MusicAssetModel(id: 0, title: "Title1", imageName: "test-cover"))
-        state.musicAssets.append(MusicAssetModel(id: 1, title: "Title2", imageName: "test-cover"))
-        state.musicAssets.append(MusicAssetModel(id: 2, title: "Title3", imageName: "test-cover"))
+        do {
+          let files = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath)
+          
+          files.enumerated().forEach { (index, file) in
+            guard let path = Bundle.main.path(forResource: file, ofType: nil) else {
+              return
+            }
+            let url = URL(fileURLWithPath: path)
+            let asset = AVURLAsset(url: url)
+            if asset.isPlayable {
+              let name = (path as NSString).lastPathComponent
+              state.musicAssets.append(MusicAssetModel(id: index, title: name, imageName: "test-cover"))
+            }
+          }
+        }
+        catch {
+          print("failed to load bundle audio assets.")
+        }
+      
         return .none
     }
 }

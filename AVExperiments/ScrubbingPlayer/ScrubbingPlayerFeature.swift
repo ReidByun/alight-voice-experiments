@@ -23,7 +23,7 @@ struct ScrubbingPlayerState: Equatable {
   // relates to view
   var progressViewOffset: CGPoint = .zero
   var progressViewWidth: Double = 0
-  
+  var musicAssetListState = MusicAssetListState()
 }
 
 enum ScrubbingPlayerAction: Equatable {
@@ -44,6 +44,7 @@ enum ScrubbingPlayerAction: Equatable {
   // relates to View
   case setProgressViewOffset(offset: CGPoint)
   case setProgressViewWidth(width: Double)
+  case musicAssetListAction(MusicAssetListAction)
 }
 
 struct ScrubbingPlayerEnvironment {
@@ -56,6 +57,7 @@ struct ScrubbingPlayerEnvironment {
   var offsetToProgress: (Double, Double)-> Double = { offset, width in return offset / width * 100.0 }
   var progressToTime: (Double, Double)-> Double = { progress, totalTime in return progress / 100.0 * totalTime }
   var progressToFrame: (Double, Int)-> Int = { progress, totalFrame in return Int(progress * Double(totalFrame) / 100.0) }
+  var musicAssetListEnvironment: MusicAssetListEnvironment
 }
 
 extension ScrubbingPlayerEnvironment {
@@ -65,7 +67,8 @@ extension ScrubbingPlayerEnvironment {
       scrubbingSourceNode: .live(),
       calcSeekFrameRelative: calcSeekFramePosition(fromTimeOffset:currentPos:audioSamples:sampleRate:),
       calcSeekFrameAbsolute: calcSeekFramePosition(fromAbsTime:audioSamples:sampleRate:),
-      mainScheduler: scheduler
+      mainScheduler: scheduler,
+      musicAssetListEnvironment: .live(scheduler: scheduler)
     )
   }
 }
@@ -74,192 +77,199 @@ let scrubbingPlayerReducer = Reducer<
   ScrubbingPlayerState,
   ScrubbingPlayerAction,
   ScrubbingPlayerEnvironment
-> { state, action, environment in
-  enum TimerId {}
-  
-  switch action {
-    case .onAppear:
-      environment.audioPlayer.setSession()
+>.combine(
+  musicAssetListReducer.pullback(
+    state: \.musicAssetListState,
+    action: /ScrubbingPlayerAction.musicAssetListAction,
+    environment: \.musicAssetListEnvironment),
+  .init { state, action, environment in
+    enum TimerId {}
+    
+    switch action {
+      case .onAppear:
+        environment.audioPlayer.setSession()
         guard let fileURL = Bundle.main.url(forResource: "IU-5s", withExtension: "mp3") else {
-//      guard let fileURL = Bundle.main.url(forResource: "roses", withExtension: "mp3") else {
-        return .none
-      }
-      return environment.audioPlayer.openUrl(fileURL)
-        .receive(on: environment.mainScheduler)
-        .catchToEffect()
-        .map(ScrubbingPlayerAction.audioLoaded)
-      
-    case .onDisappear:
-      return Effect(value: .activeTimer(on: false))
-        .eraseToEffect()
-      
-    case .skipTapped(let forward):
-      return .none
-      
-    case .playPauseTapped(let playerInfo):
-      if state.playerInfo.isPlaying {
-        state.playerInfo.isPlaying = false
-        return environment.audioPlayer.pause().fireAndForget()
-      }
-      else {
-        state.playerInfo.isPlaying = true
-        return environment.audioPlayer
-          .play(state.playerInfo)
+          //      guard let fileURL = Bundle.main.url(forResource: "roses", withExtension: "mp3") else {
+          return .none
+        }
+        return environment.audioPlayer.openUrl(fileURL)
           .receive(on: environment.mainScheduler)
-          .catchToEffect(ScrubbingPlayerAction.playingAudio)
-      }
-      
-    case .audioLoaded(let result):
-      switch result {
-        case .success(let info):
-          state.playerInfo = info
-          if let file = state.playerInfo.audioFile {
-            environment.scrubbingSourceNode.updateSource(file: file, pcmBuffer: state.playerInfo.buffer)
-            guard let srcNode = environment.scrubbingSourceNode.getSourceNode() else {
-              break
-            }
-            
-            _ = environment.audioPlayer.connectSrcNodeToMixer(state.playerInfo, srcNode)
-          }
-        case .failure(let error):
-          break
-      }
-      return Effect(value: .activeTimer(on: true))
-        .eraseToEffect()
-      
-    case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
-      state.playerInfo.isPlaying = false
-      return environment.audioPlayer.stop().fireAndForget()
-      
-    case .updateDisplay:
-      if state.playerInfo.isPlaying {
-        let currentPosition = environment.audioPlayer.playbackPosition() + state.playerInfo.seekFrame
+          .catchToEffect()
+          .map(ScrubbingPlayerAction.audioLoaded)
         
-        if !(0...state.playerInfo.audioLengthSamples ~= currentPosition) {
-          state.playerInfo.currentFramePosition = max(currentPosition, 0)
-          state.playerInfo.currentFramePosition = min(currentPosition, state.playerInfo.audioLengthSamples)
-          
-          if state.playerInfo.currentFramePosition >= state.playerInfo.audioLengthSamples {
-            
-            state.playerInfo.seekFrame = 0
-            state.playerInfo.currentFramePosition = 0
-            
-            state.playerInfo.isPlaying = false
-            return environment.audioPlayer.stop().fireAndForget()
-          }
-          else {
-            return .none
-          }
-          
+      case .onDisappear:
+        return Effect(value: .activeTimer(on: false))
+          .eraseToEffect()
+        
+      case .skipTapped(let forward):
+        return .none
+        
+      case .playPauseTapped(let playerInfo):
+        if state.playerInfo.isPlaying {
+          state.playerInfo.isPlaying = false
+          return environment.audioPlayer.pause().fireAndForget()
         }
         else {
-          state.playerInfo.currentFramePosition = currentPosition
-          let progress = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioLengthSamples) * 100.0
-          
-          //print("player frame \(frame)")
-          if state.playerInfo.playerProgress != progress {
-            //print("\(state.playerInfo.playerProgress) -> \(frame) / \(progress)")
-            state.playerInfo.prevProgress = state.playerInfo.playerProgress
-            state.playerInfo.playerProgress = progress
-          }
-          
-          let time = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioSampleRate)
-          state.playerInfo.playerTime = PlayerTime(
-            elapsedTime: time,
-            remainingTime: state.playerInfo.audioLengthSeconds - time)
+          state.playerInfo.isPlaying = true
+          return environment.audioPlayer
+            .play(state.playerInfo)
+            .receive(on: environment.mainScheduler)
+            .catchToEffect(ScrubbingPlayerAction.playingAudio)
         }
         
-        environment.scrubbingSourceNode.setCurrentPlayingFrame(frame: state.playerInfo.currentFramePosition)
-        state.progressViewOffset = CGPoint(x: environment.progressToOffset(state.playerInfo.playerProgress, state.progressViewWidth), y: 0)
-      }
-      
-      return .none
-      
-    case .activeTimer(let on):
-      if on && !state.isTimearActive {
-        state.isTimearActive = true
-        return Effect.timer(
-          id: TimerId.self,
-          every: 0.02,
-          on: environment.mainScheduler)
-        .map { _ in .updateDisplay }
-      }
-      else {
-        state.isTimearActive = false
-        return !on ? .cancel(id: TimerId.self) : .none
-      }
-      
-    case .seek(let time, let relative):
-      if relative {
-        let currentFrame = environment.audioPlayer.playbackPosition()
-        state.playerInfo.seekFrame = environment.calcSeekFrameRelative(
-          time,
-          state.playerInfo.currentFramePosition,
-          state.playerInfo.audioLengthSamples,
-          state.playerInfo.audioSampleRate)
-      }
-      else {
-        state.playerInfo.seekFrame = environment.calcSeekFrameAbsolute(
-          time,
-          state.playerInfo.audioLengthSamples,
-          state.playerInfo.audioSampleRate)
-      }
-      
-      state.playerInfo.currentFramePosition = state.playerInfo.seekFrame
-      print("seek-> \(state.playerInfo.seekFrame)")
-      
-      return environment.audioPlayer.seek(state.playerInfo.seekFrame, state.playerInfo)
-        .receive(on: environment.mainScheduler)
-        .catchToEffect(ScrubbingPlayerAction.seekDone)
-      
-    case .seekDone(let result):
-      switch result {
-        case .success(true):
-          print("seek done true")
-        case .success(false), .failure:
-          print("seek failed")
-      }
-      return .none
-      
-    case .setScrubbing(on: let on):
-      let doSeek = state.isScrubbingNow && !on
-      state.isScrubbingNow = on
-      environment.scrubbingSourceNode.setIsScrubbing(on: state.isScrubbingNow)
-      
-      if doSeek {
-        let seekTime = environment.progressToTime(state.playerInfo.playerProgress, state.playerInfo.audioLengthSeconds)
-        return Effect(value: .seek(time: seekTime, relative: false))
-      }
-      else {
-        return .none
-      }
-      
-    case .setScrubbingProperties(frame: let frame, velocity: let velocity):
-      if frame != state.scrubbingFrame {
-        state.scrubbingFrame = frame
-        state.scrubbingVelocity = velocity
-
-        environment.scrubbingSourceNode.setScrubbingInfo(frame: AVAudioFramePosition(state.scrubbingFrame), velocity: state.scrubbingVelocity)
-      }
-      //print("\(frame) - \(velocity)")
-      return .none
-      
-    case .setScrubbingPropertiesWithView(offset: let offset, velocity: let velocity):
-      if offset != state.progressViewOffset.x {
-        let progress = environment.offsetToProgress(offset, state.progressViewWidth)
-        state.playerInfo.playerProgress = progress
-        let frame = environment.progressToFrame(progress, Int(state.playerInfo.audioLengthSamples))
+      case .audioLoaded(let result):
+        switch result {
+          case .success(let info):
+            state.playerInfo = info
+            if let file = state.playerInfo.audioFile {
+              environment.scrubbingSourceNode.updateSource(file: file, pcmBuffer: state.playerInfo.buffer)
+              guard let srcNode = environment.scrubbingSourceNode.getSourceNode() else {
+                break
+              }
+              
+              _ = environment.audioPlayer.connectSrcNodeToMixer(state.playerInfo, srcNode)
+            }
+          case .failure(let error):
+            break
+        }
+        return Effect(value: .activeTimer(on: true))
+          .eraseToEffect()
         
-        return Effect(value: .setScrubbingProperties(frame: frame, velocity: velocity))
-      }
-      return .none
-      
-    case .setProgressViewOffset(let offset):
-      state.progressViewOffset = offset
-      return .none
-      
-    case .setProgressViewWidth(let width):
-      state.progressViewWidth = width
-      return .none
-  }
-}
+      case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
+        state.playerInfo.isPlaying = false
+        return environment.audioPlayer.stop().fireAndForget()
+        
+      case .updateDisplay:
+        if state.playerInfo.isPlaying {
+          let currentPosition = environment.audioPlayer.playbackPosition() + state.playerInfo.seekFrame
+          
+          if !(0...state.playerInfo.audioLengthSamples ~= currentPosition) {
+            state.playerInfo.currentFramePosition = max(currentPosition, 0)
+            state.playerInfo.currentFramePosition = min(currentPosition, state.playerInfo.audioLengthSamples)
+            
+            if state.playerInfo.currentFramePosition >= state.playerInfo.audioLengthSamples {
+              
+              state.playerInfo.seekFrame = 0
+              state.playerInfo.currentFramePosition = 0
+              
+              state.playerInfo.isPlaying = false
+              return environment.audioPlayer.stop().fireAndForget()
+            }
+            else {
+              return .none
+            }
+            
+          }
+          else {
+            state.playerInfo.currentFramePosition = currentPosition
+            let progress = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioLengthSamples) * 100.0
+            
+            //print("player frame \(frame)")
+            if state.playerInfo.playerProgress != progress {
+              //print("\(state.playerInfo.playerProgress) -> \(frame) / \(progress)")
+              state.playerInfo.prevProgress = state.playerInfo.playerProgress
+              state.playerInfo.playerProgress = progress
+            }
+            
+            let time = Double(state.playerInfo.currentFramePosition) / Double(state.playerInfo.audioSampleRate)
+            state.playerInfo.playerTime = PlayerTime(
+              elapsedTime: time,
+              remainingTime: state.playerInfo.audioLengthSeconds - time)
+          }
+          
+          environment.scrubbingSourceNode.setCurrentPlayingFrame(frame: state.playerInfo.currentFramePosition)
+          state.progressViewOffset = CGPoint(x: environment.progressToOffset(state.playerInfo.playerProgress, state.progressViewWidth), y: 0)
+        }
+        
+        return .none
+        
+      case .activeTimer(let on):
+        if on && !state.isTimearActive {
+          state.isTimearActive = true
+          return Effect.timer(
+            id: TimerId.self,
+            every: 0.02,
+            on: environment.mainScheduler)
+          .map { _ in .updateDisplay }
+        }
+        else {
+          state.isTimearActive = false
+          return !on ? .cancel(id: TimerId.self) : .none
+        }
+        
+      case .seek(let time, let relative):
+        if relative {
+          let currentFrame = environment.audioPlayer.playbackPosition()
+          state.playerInfo.seekFrame = environment.calcSeekFrameRelative(
+            time,
+            state.playerInfo.currentFramePosition,
+            state.playerInfo.audioLengthSamples,
+            state.playerInfo.audioSampleRate)
+        }
+        else {
+          state.playerInfo.seekFrame = environment.calcSeekFrameAbsolute(
+            time,
+            state.playerInfo.audioLengthSamples,
+            state.playerInfo.audioSampleRate)
+        }
+        
+        state.playerInfo.currentFramePosition = state.playerInfo.seekFrame
+        print("seek-> \(state.playerInfo.seekFrame)")
+        
+        return environment.audioPlayer.seek(state.playerInfo.seekFrame, state.playerInfo)
+          .receive(on: environment.mainScheduler)
+          .catchToEffect(ScrubbingPlayerAction.seekDone)
+        
+      case .seekDone(let result):
+        switch result {
+          case .success(true):
+            print("seek done true")
+          case .success(false), .failure:
+            print("seek failed")
+        }
+        return .none
+        
+      case .setScrubbing(on: let on):
+        let doSeek = state.isScrubbingNow && !on
+        state.isScrubbingNow = on
+        environment.scrubbingSourceNode.setIsScrubbing(on: state.isScrubbingNow)
+        
+        if doSeek {
+          let seekTime = environment.progressToTime(state.playerInfo.playerProgress, state.playerInfo.audioLengthSeconds)
+          return Effect(value: .seek(time: seekTime, relative: false))
+        }
+        else {
+          return .none
+        }
+        
+      case .setScrubbingProperties(frame: let frame, velocity: let velocity):
+        if frame != state.scrubbingFrame {
+          state.scrubbingFrame = frame
+          state.scrubbingVelocity = velocity
+          
+          environment.scrubbingSourceNode.setScrubbingInfo(frame: AVAudioFramePosition(state.scrubbingFrame), velocity: state.scrubbingVelocity)
+        }
+        //print("\(frame) - \(velocity)")
+        return .none
+        
+      case .setScrubbingPropertiesWithView(offset: let offset, velocity: let velocity):
+        if offset != state.progressViewOffset.x {
+          let progress = environment.offsetToProgress(offset, state.progressViewWidth)
+          state.playerInfo.playerProgress = progress
+          let frame = environment.progressToFrame(progress, Int(state.playerInfo.audioLengthSamples))
+          
+          return Effect(value: .setScrubbingProperties(frame: frame, velocity: velocity))
+        }
+        return .none
+        
+      case .setProgressViewOffset(let offset):
+        state.progressViewOffset = offset
+        return .none
+        
+      case .setProgressViewWidth(let width):
+        state.progressViewWidth = width
+        return .none
+      case .musicAssetListAction(_):
+        return .none
+    }
+  })

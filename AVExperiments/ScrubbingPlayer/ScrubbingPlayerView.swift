@@ -11,11 +11,18 @@ import ComposableArchitecture
 struct ScrubbingPlayerView: View {
   let store: Store<ScrubbingPlayerState, ScrubbingPlayerAction>
   let timer = Timer.publish(every: 0.001, on: .main, in: .common).autoconnect()
+  
   @State var isAutoScrollMode = false
+  @State var showAssetList = false
   
   var body: some View {
     WithViewStore(self.store) { viewStore in
       VStack {
+        Button {
+          showAssetList = true
+        } label: {
+          Text("Asset List")
+        }
         Image.artwork
           .resizable()
           .aspectRatio(
@@ -32,6 +39,13 @@ struct ScrubbingPlayerView: View {
       }
       .onDisappear() {
         viewStore.send(.onDisappear)
+      }
+      .sheet(isPresented: $showAssetList) {
+        MusicAssetListView(
+          store: self.store.scope(
+            state: \.musicAssetListState,
+            action: ScrubbingPlayerAction.musicAssetListAction
+          ))
       }
     }
   }
