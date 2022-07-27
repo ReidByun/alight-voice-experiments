@@ -123,7 +123,7 @@ let scrubbingPlayerReducer = Reducer<
             state.playerInfo = info
             if let file = state.playerInfo.audioFile {
               environment.scrubbingSourceNode.updateSource(file: file, pcmBuffer: state.playerInfo.buffer)
-              guard let srcNode = environment.scrubbingSourceNode.getSourceNode() else {
+              guard let srcNode = environment.scrubbingSourceNode.getSourceNode(renew: true) else {
                 break
               }
               
@@ -269,7 +269,18 @@ let scrubbingPlayerReducer = Reducer<
       case .setProgressViewWidth(let width):
         state.progressViewWidth = width
         return .none
-      case .musicAssetListAction(_):
+        
+      case .musicAssetListAction(.selecet(let id)):
+        guard let asset = state.musicAssetListState.musicAssets.first(where: { $0.id == id }) else {
+          return .none
+        }
+        
+        return environment.audioPlayer.openUrl(asset.url)
+          .receive(on: environment.mainScheduler)
+          .catchToEffect()
+          .map(ScrubbingPlayerAction.audioLoaded)
+        
+      case .musicAssetListAction:
         return .none
     }
   })

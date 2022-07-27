@@ -312,15 +312,6 @@ private class AudioEngineClientWrapper: NSObject {
   }
   
   func connectNodeToMixer(audioInfo: ScrubbingPlayerModel, srcNode: AVAudioSourceNode)-> Bool {
-//    guard let file = audioInfo.audioFile else {
-//      return
-//    }
-//
-//    let scrubbingSourceNode = GenScrubbingSourceNode(file: file, pcmBuffer: audioInfo.buffer)
-//    guard let srcNode = scrubbingSourceNode.getSourceNode() else {
-//      return
-//    }
-//
     engine.attach(srcNode)
     engine.connect(
       srcNode,

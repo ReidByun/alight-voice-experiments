@@ -45,7 +45,8 @@ struct ScrubbingPlayerView: View {
           store: self.store.scope(
             state: \.musicAssetListState,
             action: ScrubbingPlayerAction.musicAssetListAction
-          ))
+          ),
+          showView: $showAssetList)
       }
     }
   }

@@ -10,6 +10,12 @@ import Foundation
 
 struct MusicAssetModel: Equatable, Identifiable {
   var id: Int = 0
-  var title: String = "Title"
-  var imageName: String
+  var imageName: String = ""
+  var path: String = ""
+  var url: URL {
+    URL(fileURLWithPath: self.path)
+  }
+  var title: String {
+    (self.path as NSString).lastPathComponent
+  }
 }

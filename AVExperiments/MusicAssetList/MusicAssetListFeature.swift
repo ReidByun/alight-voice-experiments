@@ -17,6 +17,7 @@ struct MusicAssetListState: Equatable {
 
 enum MusicAssetListAction: Equatable {
   case load
+  case selecet(id: Int)
 }
 
 struct MusicAssetListEnvironment: Equatable {
@@ -37,17 +38,17 @@ let musicAssetListReducer = Reducer<
     switch action {
       case .load:
         do {
+          state.musicAssets.removeAll()
           let files = try FileManager.default.contentsOfDirectory(atPath: Bundle.main.bundlePath)
           
           files.enumerated().forEach { (index, file) in
             guard let path = Bundle.main.path(forResource: file, ofType: nil) else {
               return
             }
-            let url = URL(fileURLWithPath: path)
-            let asset = AVURLAsset(url: url)
+            let assetModel = MusicAssetModel(id: index, imageName: "test-cover", path: path)
+            let asset = AVURLAsset(url: assetModel.url)
             if asset.isPlayable {
-              let name = (path as NSString).lastPathComponent
-              state.musicAssets.append(MusicAssetModel(id: index, title: name, imageName: "test-cover"))
+              state.musicAssets.append(assetModel)
             }
           }
         }
@@ -55,6 +56,10 @@ let musicAssetListReducer = Reducer<
           print("failed to load bundle audio assets.")
         }
       
+        return .none
+        
+      case .selecet(let id):
+        print("select action from the sheet \(id)")
         return .none
     }
 }

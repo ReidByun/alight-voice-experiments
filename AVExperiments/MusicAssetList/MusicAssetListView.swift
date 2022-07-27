@@ -10,6 +10,8 @@ import ComposableArchitecture
 
 struct MusicAssetListView: View {
   let store: Store<MusicAssetListState, MusicAssetListAction>
+  @Binding var showView: Bool
+  
   var body: some View {
     WithViewStore(self.store) { viewStore in
       List {
@@ -19,6 +21,10 @@ struct MusicAssetListView: View {
               .resizable()
               .frame(width: 20, height: 20)
             Text(musicAsset.title)
+          }
+          .onTapGesture {
+            viewStore.send(.selecet(id: musicAsset.id))
+            showView = false
           }
         }
       }
@@ -43,7 +49,7 @@ struct MusicAssetListView_Previews: PreviewProvider {
           initialState: MusicAssetListState(),
           reducer: musicAssetListReducer,
           environment: .live(scheduler: .main)
-        )
+        ), showView: .constant(true)
       )
     }
 }
