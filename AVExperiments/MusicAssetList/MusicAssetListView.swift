@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import CryptoKit
 
 struct MusicAssetListView: View {
   let store: Store<MusicAssetListState, MusicAssetListAction>
@@ -16,12 +17,7 @@ struct MusicAssetListView: View {
     WithViewStore(self.store) { viewStore in
       List {
         ForEach(viewStore.musicAssets) { musicAsset in
-          HStack {
-            Image(musicAsset.imageName)
-              .resizable()
-              .frame(width: 20, height: 20)
-            Text(musicAsset.title)
-          }
+          MusicAssetItemView(musicAsset: musicAsset)
           .onTapGesture {
             viewStore.send(.selecet(id: musicAsset.id))
             showView = false
@@ -36,9 +32,26 @@ struct MusicAssetListView: View {
 }
 
 struct MusicAssetItemView: View {
+  var musicAsset: MusicAssetModel
+  var albumArt: UIImage {
+    if let data = musicAsset.artworkData {
+      return UIImage(data: data as Data)!
+    }
+    else {
+      return UIImage(named: "test-cover")!
+    }
+  }
+  
   
   var body: some View {
-    Text("")
+    HStack {
+      Image(uiImage: albumArt)
+        .resizable()
+        .frame(width: 20, height: 20)
+      Text(musicAsset.title)
+      Spacer()
+      Text(musicAsset.formattedTime)
+    }
   }
 }
 

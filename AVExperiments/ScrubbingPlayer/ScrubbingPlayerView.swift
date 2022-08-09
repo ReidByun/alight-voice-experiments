@@ -15,6 +15,8 @@ struct ScrubbingPlayerView: View {
   @State var isAutoScrollMode = false
   @State var showAssetList = false
   
+  @State var artwork: Image = Image.artwork
+  
   var body: some View {
     WithViewStore(self.store) { viewStore in
       VStack {
@@ -23,13 +25,16 @@ struct ScrubbingPlayerView: View {
         } label: {
           Text("Asset List")
         }
-        Image.artwork
+        Spacer()
+        artwork
           .resizable()
           .aspectRatio(
             nil,
             contentMode: .fit)
           .padding()
           .layoutPriority(1)
+        
+        Spacer()
         
         PlayerControlView
           .padding(.bottom)
@@ -47,6 +52,14 @@ struct ScrubbingPlayerView: View {
             action: ScrubbingPlayerAction.musicAssetListAction
           ),
           showView: $showAssetList)
+      }
+      .onChange(of: viewStore.artwork) { newImage in
+        if let data = newImage {
+          self.artwork = Image(uiImage: UIImage(data: data as Data)!)
+        }
+        else {
+          self.artwork = Image.artwork
+        }
       }
     }
   }

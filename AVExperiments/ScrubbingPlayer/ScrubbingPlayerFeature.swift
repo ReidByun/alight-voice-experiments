@@ -10,6 +10,7 @@ import Foundation
 import Combine
 import ComposableArchitecture
 import AVFoundation
+import SwiftUI
 
 struct ScrubbingPlayerState: Equatable {
   var playerInfo: ScrubbingPlayerModel = ScrubbingPlayerModel()
@@ -24,6 +25,7 @@ struct ScrubbingPlayerState: Equatable {
   var progressViewOffset: CGPoint = .zero
   var progressViewWidth: Double = 0
   var musicAssetListState = MusicAssetListState()
+  var artwork: NSData? = nil
 }
 
 enum ScrubbingPlayerAction: Equatable {
@@ -87,11 +89,32 @@ let scrubbingPlayerReducer = Reducer<
     
     switch action {
       case .onAppear:
+        do {
+          state.musicAssetListState.musicAssets = try environment.musicAssetListEnvironment.bundleAudioLoader()
+        }
+        catch {
+          print("failed to load bundle audio files \(error)")
+        }
+        
         environment.audioPlayer.setSession()
-        guard let fileURL = Bundle.main.url(forResource: "IU-5s", withExtension: "mp3") else {
-          //      guard let fileURL = Bundle.main.url(forResource: "roses", withExtension: "mp3") else {
+//
+        let fileURL: URL? = {
+          if let asset = state.musicAssetListState.musicAssets.first {
+            state.artwork = asset.artworkData
+            return asset.url
+          }
+          else {
+            guard let url = Bundle.main.url(forResource: "IU-5s", withExtension: "mp3") else {
+              return nil
+            }
+            return url
+          }
+        }()
+        
+        guard let fileURL = fileURL else {
           return .none
         }
+
         return environment.audioPlayer.openUrl(fileURL)
           .receive(on: environment.mainScheduler)
           .catchToEffect()
@@ -274,7 +297,7 @@ let scrubbingPlayerReducer = Reducer<
         guard let asset = state.musicAssetListState.musicAssets.first(where: { $0.id == id }) else {
           return .none
         }
-        
+        state.artwork = asset.artworkData
         return environment.audioPlayer.openUrl(asset.url)
           .receive(on: environment.mainScheduler)
           .catchToEffect()

@@ -48,6 +48,10 @@ struct PlayerTime: Equatable {
     remainingText = PlayerTime.formatted(time: remainingTime)
   }
   
+  init(durationTime: Double) {
+    self.init(elapsedTime: 0, remainingTime: durationTime)
+  }
+  
   private static func formatted(time: Double) -> String {
     var seconds = Int(ceil(time))
     var hours = 0
