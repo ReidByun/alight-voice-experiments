@@ -123,8 +123,21 @@ extension AudioEngineClient {
         }
         
         return playerDelegate.connectNodeToMixer(audioInfo: audioInfo, srcNode: srcNode)
+      },
+      startFileRecording: { audioInfo, fileName in
+        guard let playerDelegate = delegate else {
+          return
+        }
+        
+        playerDelegate.startFileRecording(audioInfo: audioInfo, fileName: fileName)
+      },
+      stopFileRecording: {
+        guard let playerDelegate = delegate else {
+          return
+        }
+        
+        playerDelegate.stopFileRecording()
       }
-      
     )
   }
 }
@@ -152,6 +165,10 @@ private class AudioEngineClientWrapper: NSObject {
     //print("last Render(\(lastRenderTime)), playerTime(\(playerTime))")
     return playerTime.sampleTime
   }
+  
+//  private var autoScrubbingTimer: Timer? = nil
+//  private var filteredOutputURL: URL!
+//  private var newAudio: AVAudioFile = AVAudioFile()
   
   init(
     avAudioFile: AVAudioFile
@@ -320,5 +337,46 @@ private class AudioEngineClientWrapper: NSObject {
     
     return true
   }
+  
+  func startFileRecording(audioInfo: ScrubbingPlayerModel, fileName: String) {
+    // File to write
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    //let audioURL = documentsDirectory.appendingPathComponent("share.m4a")
+    //let audioURL = documentsDirectory.appendingPathComponent("sine.m4a")
+    let audioURL = documentsDirectory.appendingPathComponent(fileName)
+    
+    // Audio File settings
+    let settings = [
+      AVFormatIDKey: Int(kAudioFormatLinearPCM),
+      //AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+      AVSampleRateKey: Int(audioInfo.audioSampleRate),
+      AVNumberOfChannelsKey: Int(audioInfo.audioChannelCount),
+      AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue
+    ]
+    
+    // Audio File
+    var audioFile = AVAudioFile()
+    do {
+      audioFile = try AVAudioFile(forWriting: audioURL, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+    }
+    catch {
+      print ("Failed to open Audio File For Writing: \(error.localizedDescription)")
+    }
+    
+    // Install Tap on mainMixer
+    engine.mainMixerNode.installTap(onBus: 0, bufferSize: 8192, format: nil, block: { (pcmBuffer, when) in
+      do {
+        try audioFile.write(from: pcmBuffer)
+      }
+      catch {
+        print("Failed to write Audio File: \(error.localizedDescription)")
+      }
+    })
+  }
+  
+  func stopFileRecording() {
+    engine.mainMixerNode.removeTap(onBus: 0)
+  }
+  
 }
 

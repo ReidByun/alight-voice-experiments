@@ -90,6 +90,12 @@ struct ScrubbingPlayerView: View {
           text: "Auto Scroll",
           action: { press in
             viewStore.send(.setScrubbing(on: press))
+            if (!self.isAutoScrollMode && press) {
+              viewStore.send(.startFileRecording(fileName: "test.raw"))
+            }
+            else {
+              viewStore.send(.stopFileRecording)
+            }
             self.isAutoScrollMode = press
           })
         .font(.system(size: 20))
@@ -102,7 +108,8 @@ struct ScrubbingPlayerView: View {
             viewStore.send(.setProgressViewOffset(offset: offset))
           }
           else {
-            viewStore.send(.setProgressViewOffset(offset: .zero))
+            viewStore.send(.stopFileRecording)
+            //viewStore.send(.setProgressViewOffset(offset: .zero))
           }
         }
       }

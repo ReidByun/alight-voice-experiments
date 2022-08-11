@@ -20,6 +20,10 @@ struct AudioEngineClient {
   var playbackPosition: () -> AVAudioFramePosition
   var seek: (AVAudioFramePosition, ScrubbingPlayerModel)-> Effect<Bool, Failure>
   var connectSrcNodeToMixer: (ScrubbingPlayerModel, AVAudioSourceNode)-> Bool
+//  var startAutoScrubbing: (ScrubbingPlayerModel)-> Void
+//  var stopAutoSCrubbing: ()-> Void
+  var startFileRecording: (ScrubbingPlayerModel, String)-> Void
+  var stopFileRecording: ()-> Void
   
   enum Action: Equatable {
     case didFinishPlaying(successfully: Bool)

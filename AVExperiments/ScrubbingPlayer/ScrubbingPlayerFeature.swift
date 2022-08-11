@@ -42,6 +42,8 @@ enum ScrubbingPlayerAction: Equatable {
   case setScrubbing(on: Bool)
   case setScrubbingProperties(frame: Int, velocity: Double)
   case setScrubbingPropertiesWithView(offset: Double, velocity: Double)
+  case startFileRecording(fileName: String)
+  case stopFileRecording
   
   // relates to View
   case setProgressViewOffset(offset: CGPoint)
@@ -283,6 +285,14 @@ let scrubbingPlayerReducer = Reducer<
           
           return Effect(value: .setScrubbingProperties(frame: frame, velocity: velocity))
         }
+        return .none
+        
+      case .startFileRecording(let fileName):
+        environment.audioPlayer.startFileRecording(state.playerInfo, fileName)
+        return .none
+      
+      case .stopFileRecording:
+        environment.audioPlayer.stopFileRecording()
         return .none
         
       case .setProgressViewOffset(let offset):
