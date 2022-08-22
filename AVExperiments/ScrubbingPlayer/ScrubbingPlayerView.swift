@@ -89,30 +89,33 @@ struct ScrubbingPlayerView: View {
         StateButtonView(
           text: "Auto Scroll",
           action: { press in
-            viewStore.send(.setScrubbing(on: press))
-            if (!self.isAutoScrollMode && press) {
-              viewStore.send(.startFileRecording(fileName: "test.raw"))
+            if viewStore.playerInfo.isPlaying {
+              viewStore.send(.playPauseTapped(viewStore.playerInfo))
             }
-            else {
-              viewStore.send(.stopFileRecording)
-            }
+            viewStore.send(.setAutoScrubbing(on: press))
+//            if (!self.isAutoScrollMode && press) {
+//              viewStore.send(.startFileRecording(fileName: "test.raw"))
+//            }
+//            else {
+//              viewStore.send(.stopFileRecording)
+//            }
             self.isAutoScrollMode = press
           })
         .font(.system(size: 20))
         
       }
-      .onReceive(timer) { _ in
-        if isAutoScrollMode {
-          if viewStore.progressViewOffset.x <= 390 {
-            let offset = CGPoint(x: viewStore.progressViewOffset.x + 0.085, y: viewStore.progressViewOffset.y)
-            viewStore.send(.setProgressViewOffset(offset: offset))
-          }
-          else {
-            viewStore.send(.stopFileRecording)
-            //viewStore.send(.setProgressViewOffset(offset: .zero))
-          }
-        }
-      }
+//      .onReceive(timer) { _ in
+//        if isAutoScrollMode {
+//          if viewStore.progressViewOffset.x <= 390 {
+//            let offset = CGPoint(x: viewStore.progressViewOffset.x + 0.085, y: viewStore.progressViewOffset.y)
+//            viewStore.send(.setProgressViewOffset(offset: offset))
+//          }
+//          else {
+//            viewStore.send(.stopFileRecording)
+//            //viewStore.send(.setProgressViewOffset(offset: .zero))
+//          }
+//        }
+//      }
       //.padding(.horizontal)
     }
   }

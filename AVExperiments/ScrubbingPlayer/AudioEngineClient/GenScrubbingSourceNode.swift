@@ -15,13 +15,15 @@ class GenScrubbingSourceNode: Equatable {
   private var buffer: AVAudioPCMBuffer? = nil
   
   private var isScrubbing = false
-  private var velocity = 0.0
-  private var lastScrubbingStartFrame = 0
+  private var velocity = 100.0
+  private(set) var lastScrubbingStartFrame = 0
   
   private var scrubbingFrame = 0
   private var prevScrubbingFrame = 0
   private var scrubbingStoppedFrame = 0
   private var isForwardScrubbing = true
+  
+  private var autoScrubbingTimer: Timer? = nil
   
   
   init() {}
@@ -30,10 +32,26 @@ class GenScrubbingSourceNode: Equatable {
     self.init()
     audioFile = file
     buffer = pcmBuffer
+    initParam()
+  }
+  
+  func initParam() {
+    isScrubbing = false
+    velocity = 100.0
+    lastScrubbingStartFrame = 0
+    
+    scrubbingFrame = 0
+    prevScrubbingFrame = 0
+    scrubbingStoppedFrame = 0
+    isForwardScrubbing = true
+    if autoScrubbingTimer != nil {
+      autoScrubbingTimer?.invalidate()
+      autoScrubbingTimer = nil
+    }
   }
   
   func getSourceNode(renew: Bool = false)-> AVAudioSourceNode? {
-    if sourceNode == nil || renew {
+    if renew {
       sourceNode = AVAudioSourceNode { _, _, frameCount, audioBufferList -> OSStatus in
         let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
         self.processScrubbing(ablPointer: ablPointer, frameCount: Int(frameCount))
@@ -46,6 +64,9 @@ class GenScrubbingSourceNode: Equatable {
   
   func processScrubbing(ablPointer: UnsafeMutableAudioBufferListPointer, frameCount: Int) {
     if let buffer = self.buffer, self.isScrubbing {
+      guard self.scrubbingFrame >= 0 else {
+        return
+      }
       var targetFrame = self.scrubbingFrame
       let currentScrubbingFrame = targetFrame
       
@@ -83,6 +104,9 @@ class GenScrubbingSourceNode: Equatable {
           // or mute.
           targetFrame = lastScrubbingStartFrame
         }
+      }
+      else {
+        scrubbingStoppedFrame = 0
       }
       
       prevScrubbingFrame = currentScrubbingFrame
@@ -137,6 +161,7 @@ class GenScrubbingSourceNode: Equatable {
   }
   
   func updateSource(file: AVAudioFile, pcmBuffer: AVAudioPCMBuffer) {
+    initParam()
     audioFile = file
     buffer = pcmBuffer
   }
@@ -152,6 +177,45 @@ class GenScrubbingSourceNode: Equatable {
   func setScrubbingInfo(frame: AVAudioFramePosition, velocity: Double) {
     self.scrubbingFrame = Int(frame)
     self.velocity = velocity
+  }
+  
+  func setAutoScrubbing(on: Bool) {
+    let maximumFrameCount = Int(buffer!.frameLength)
+    
+    if on {
+      self.scrubbingFrame = self.lastScrubbingStartFrame
+      
+      if autoScrubbingTimer != nil { // timer is working
+        autoScrubbingTimer?.invalidate()
+        autoScrubbingTimer = nil
+      }
+      
+      self.isScrubbing = true
+      autoScrubbingTimer = Timer.scheduledTimer(withTimeInterval: 0.00011, repeats: true, block: { timer in
+        
+        var targetFrame = self.scrubbingFrame + 5
+        if targetFrame > maximumFrameCount {
+          targetFrame = maximumFrameCount
+        }
+        self.setScrubbingInfo(frame: AVAudioFramePosition(targetFrame), velocity: 100.0)
+            
+//        self.playerProgress = self.playerProgress + 0.09
+//        if self.playerProgress > 100.0 {
+//          timer.invalidate()
+//          self.engine.pause()
+//          self.isScrubbing = false
+//          self.playerProgress = 0
+//          self.engine.mainMixerNode.removeTap(onBus: 0)
+//          try? self.engine.start()
+//          self.autoScrubbingTimer = nil
+//        }
+      })
+    }
+    else {
+      autoScrubbingTimer?.invalidate()
+      autoScrubbingTimer = nil
+      self.isScrubbing = false
+    }
   }
   
   static func == (lhs: GenScrubbingSourceNode, rhs: GenScrubbingSourceNode) -> Bool {

@@ -44,6 +44,7 @@ enum ScrubbingPlayerAction: Equatable {
   case setScrubbingPropertiesWithView(offset: Double, velocity: Double)
   case startFileRecording(fileName: String)
   case stopFileRecording
+  case setAutoScrubbing(on: Bool)
   
   // relates to View
   case setProgressViewOffset(offset: CGPoint)
@@ -163,10 +164,33 @@ let scrubbingPlayerReducer = Reducer<
       case .playingAudio(.success(.didFinishPlaying)), .playingAudio(.failure):
         state.playerInfo.isPlaying = false
         return environment.audioPlayer.stop().fireAndForget()
+//      case let .playingAudio(.success(.didFinishPlaying(successfuly))):
+//        state.playerInfo.isPlaying = false
+//        return environment.audioPlayer.stop().fireAndForget()]
+//      case .playingAudio(.failure(let failMessage)):
+//        state.playerInfo.isPlaying = false
+//        return environment.audioPlayer.stop().fireAndForget()]
+//      case .playingAudio(let result):
+//        switch result {
+//          case let .success(.didFinishPlaying(successfully)):
+//            print(successfully)
+//          case .failure(let error):
+//            switch error {
+//              case .couldntCreateAudioPlayer: break
+//              case .decodeErrorDidOccur: break
+//            }
+//        }
+//        return .none
         
       case .updateDisplay:
-        if state.playerInfo.isPlaying {
-          let currentPosition = environment.audioPlayer.playbackPosition() + state.playerInfo.seekFrame
+        if state.playerInfo.isPlaying || state.playerInfo.isAutoScrubbing {
+          let currentPosition: AVAudioFramePosition = {
+            if state.playerInfo.isPlaying {
+              return environment.audioPlayer.playbackPosition() + state.playerInfo.seekFrame
+            }
+            else {
+              return AVAudioFramePosition(environment.scrubbingSourceNode.lastScrubbingStartFrame)
+            }}()
           
           if !(0...state.playerInfo.audioLengthSamples ~= currentPosition) {
             state.playerInfo.currentFramePosition = max(currentPosition, 0)
@@ -301,6 +325,11 @@ let scrubbingPlayerReducer = Reducer<
         
       case .setProgressViewWidth(let width):
         state.progressViewWidth = width
+        return .none
+        
+      case .setAutoScrubbing(let on):
+        state.playerInfo.isAutoScrubbing = on
+        environment.scrubbingSourceNode.setAutoScrubbing(on: on)
         return .none
         
       case .musicAssetListAction(.selecet(let id)):

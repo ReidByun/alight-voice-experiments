@@ -26,6 +26,7 @@ struct ScrubbingPlayerModel: Equatable {
   private var scrubbingInPlaying = false
   
   var isPlaying = false
+  var isAutoScrubbing = false
   var playerProgress: Double = 0
   var prevProgress: Double = -1
   
