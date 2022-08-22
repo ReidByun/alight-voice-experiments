@@ -336,6 +336,9 @@ let scrubbingPlayerReducer = Reducer<
         guard let asset = state.musicAssetListState.musicAssets.first(where: { $0.id == id }) else {
           return .none
         }
+        if let scrubbingNode = environment.scrubbingSourceNode.getSourceNode() {
+          _ = environment.audioPlayer.disconnectSrcNode(scrubbingNode)
+        }
         state.artwork = asset.artworkData
         return environment.audioPlayer.openUrl(asset.url)
           .receive(on: environment.mainScheduler)

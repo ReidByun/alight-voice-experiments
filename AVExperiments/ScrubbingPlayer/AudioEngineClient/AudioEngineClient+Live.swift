@@ -124,6 +124,13 @@ extension AudioEngineClient {
         
         return playerDelegate.connectNodeToMixer(audioInfo: audioInfo, srcNode: srcNode)
       },
+      disconnectSrcNode: { srcNode in
+        guard let playerDelegate = delegate else {
+          return false
+        }
+        
+        return playerDelegate.disconnectNode(srcNode: srcNode)
+      },
       startFileRecording: { audioInfo, fileName in
         guard let playerDelegate = delegate else {
           return
@@ -334,6 +341,12 @@ private class AudioEngineClientWrapper: NSObject {
       srcNode,
       to: engine.mainMixerNode,
       format: audioInfo.buffer.format)
+    
+    return true
+  }
+  
+  func disconnectNode(srcNode: AVAudioSourceNode)-> Bool {
+    engine.detach(srcNode)
     
     return true
   }
