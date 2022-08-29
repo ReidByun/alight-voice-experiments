@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Dispatch
 
 struct RootState {
   var scrubbingPlayerState = ScrubbingPlayerState()
